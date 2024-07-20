@@ -71,7 +71,8 @@ void NiceBusT4::control(const CoverCall &call) {
 void NiceBusT4::setup() {
 
 
-  _uart =  uart_init(_UART_NO, BAUD_WORK, SERIAL_8N1, SERIAL_6E2, TX_P, 256, false);
+ // _uart =  uart_init(_UART_NO, BAUD_WORK, SERIAL_8N1, SERIAL_6E2, TX_P, 256, false); //for ESP8266
+  _uart =  uartBegin(_UART_NO, BAUD_WORK, SERIAL_8N1, RX_PIN, TX_PIN, 256, false); //for WT32
   // кто в сети?
 //  this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
   

@@ -942,7 +942,8 @@ void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   uartSetBaudRate(_uart, BAUD_BREAK);                            // занижаем бодрэйт
   //uart_write(_uart, &br_ch, 1);                                    // отправляем ноль на низкой скорости, длиинный ноль
   //uartWrite(_uart, &br_ch, 1);  
-  uartWriteBuf(_uart, &br_ch, 1); 
+  //uartWriteBuf(_uart, &br_ch, 1); 
+  uart_write_bytes(UART_NUM_1, &br_ch, 1);
   //uart_write(_uart, (char *)&dummy, 1);
   //uart_wait_tx_empty(_uart);                                       // ждём, пока отправка завершится. Здесь в библиотеке uart.h (esp8266 core 3.0.2) ошибка, ожидания недостаточно при дальнейшем uart_set_baudrate().
   //uart_wait_tx_done(_uart)
@@ -950,7 +951,8 @@ void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   delayMicroseconds(150); //for ESP32
   uartSetBaudRate(_uart, BAUD_WORK);                             // возвращаем рабочий бодрэйт
   //uartWrite(_uart, (char *)&data[0], len);                                // отправляем основную посылку
-  uartWriteBuf(_uart, (char *)&data[0], len); 
+  //uartWriteBuf(_uart, (char *)&data[0], len); 
+  uart_write_bytes(UART_NUM_1, (char *)&data[0], len);
   //uart_write(_uart, (char *)raw_cmd_buf, sizeof(raw_cmd_buf));
   //uart_wait_tx_done(_uart);                                       // ждем завершения отправки
   delayMicroseconds(150); //for ESP32

@@ -949,7 +949,7 @@ void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   //delayMicroseconds(90);                                          // добавляем задержку к ожиданию, иначе скорость переключится раньше отправки. С задержкой на d1-mini я получил идеальный сигнал, break = 520us
   delayMicroseconds(150); //for ESP32
   uartSetBaudRate(_uart, BAUD_WORK);                             // возвращаем рабочий бодрэйт
-  uartWrite(_uart, (char *)&data[0], len);                                // отправляем основную посылку
+  //uartWrite(_uart, (char *)&data[0], len);                                // отправляем основную посылку
   uartWriteBuf(_uart, (char *)&data[0], len); 
   //uart_write(_uart, (char *)raw_cmd_buf, sizeof(raw_cmd_buf));
   //uart_wait_tx_done(_uart);                                       // ждем завершения отправки

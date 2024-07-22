@@ -955,7 +955,9 @@ void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   //uartWriteBuf(_uart, (char *)&data[0], len); 
   uart_write_bytes(UART_NUM_1, (char *)&data[0], len);
   //uart_write(_uart, (char *)raw_cmd_buf, sizeof(raw_cmd_buf));
-  //uart_wait_tx_done(_uart);                                       // ждем завершения отправки
+  //uart_wait_tx_empty(_uart);                                      // ждем завершения отправки
+  uart_wait_tx_done(UART_NUM_1,100);
+  //delayMicroseconds(90);
   delayMicroseconds(150); //for ESP32
 
 

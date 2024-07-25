@@ -62,11 +62,13 @@ using namespace esphome::cover;
 //using esp8266::timeoutTemplate::oneShotMs;
 
 
-static const int _UART_NO=UART0; /* номер uart */
-static const int TX_P = 1;         /* пин Tx */
-static const uint32_t BAUD_BREAK = 9200; /* бодрэйт для длинного импульса перед пакетом */
-static const uint32_t BAUD_WORK = 19200; /* рабочий бодрэйт */
-static const uint8_t START_CODE = 0x55; /*стартовый байт пакета */
+static const int _UART_NO=GPIO_NUM_1; /* uart number */
+//static const int _UART_NO=UART_NUM_1;
+static const int TX_PIN = 17;           /* pin Tx */
+static const int RX_PIN = 5;           /* pin Rx */
+static const uint32_t BAUD_BREAK = 9200; /* baudrate for a long pulse before the packet */
+static const uint32_t BAUD_WORK = 19200; /* working baudrate */
+static const uint8_t START_CODE = 0x55; /*packet start byte */
 
 static const float CLOSED_POSITION_THRESHOLD = 0.007;  // Значение положения привода в процентах, ниже которого ворота считаются полностью закрытыми
 static const uint32_t POSITION_UPDATE_INTERVAL = 500;  // Интервал обновления текущего положения привода, мс

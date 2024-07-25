@@ -1,27 +1,76 @@
-# Отправляет пакеты через uart в шину Nice BUS T4
+#Sends packets via uart to the Nice BUS T4
+#Tested on WT32_ETH01 & Nice Robus 400
+
+substitutions:
+  device_name: "nice-robus-400-busT4-uart"
+  device_name_friendly: "Nice Robus 400"
+  api_password: !secret     wt32_eth01_api_password
+  ota_password: !secret     wt32_eth01_ota_password
+  #mqtt_broker_address: !secret   mqtt_broker_address
+  led_gpio:                 GPIO5 #not applicable on WT32-ETH01 without additional LED
+  #device_ip: 192.168.5.60
 
 esphome:
-  name: "nice-wifi"
-#  name_add_mac_suffix: true
-  platform: ESP8266
-  board: d1_mini
+  name: ${device_name}
+  friendly_name: ${device_name_friendly}
+  #platform: ESP32
+  #board: esp-wrover-kit
+
+esp32:
+  board: wt32-eth01
+  # board: esp32dev
+  framework:
+    type: arduino
+
+ethernet:
+  type: LAN8720
+  mdc_pin: GPIO23
+  mdio_pin: GPIO18
+  clk_mode: GPIO0_IN
+  phy_addr: 1
+  power_pin: GPIO16
+  #Optional manual IP
+  #manual_ip:
+  #  static_ip: $device_ip
+  #  gateway: $network_gateway
+  #  subnet: $network_subnet
+
+ota:
+  - platform: esphome
+    password: $ota_password
+
+# Set statul led for WT32-ETH01
+status_led:
+  pin: 
+    number: 12
+    inverted: true
 
 external_components:
   - source:
       type: git
-      url: https://github.com/pruwait/Nice_BusT4
-#  - source: my_components
+      url: https://github.com/karol27/Nice_BusT4_WT32-ETH01
+    refresh: 0s
     
 # Enable logging
 logger:
   level: DEBUG
   baud_rate: 0
-  
+
+#captive_portal:
+
+web_server:
+  port: 80
+#  js_include: "www.js"
+#  js_url: ""
+#  version: 2  
+
 # Enable Home Assistant API
 api:
-#  reboot_timeout: 0s # иначе перезагружается при отключении от hassio  
+  encryption:
+    key: $api_password
+  reboot_timeout: 0s # otherwise reboots when disconnected from hassio  
   services:
-# для отправки hex команд на привод
+# to send hex commands to the bus T4
   - service: raw_command
     variables:
         raw_cmd: string
@@ -42,19 +91,19 @@ api:
       lambda: |-
         nice_cover -> NiceBusT4::send_inf_cmd(to_addr, whose, command, type_command, next_data, data_on, data_command);
 
-# распознавание длины створки
+# sash length recognition
   - service: gate_length_recognition
     then:
       lambda: |-
          nice_cover -> NiceBusT4::set_mcu("0b","01");
 
-# распознавание устройств BlueBus
+# BlueBus device recognition
   - service: devices_recognition
     then:
       lambda: |-
          nice_cover -> NiceBusT4::set_mcu("0a","01");         
 
-# усилие при закрытии
+# closing force
   - service: closing_force
     variables:
       force: string
@@ -62,7 +111,7 @@ api:
       lambda: |-
          nice_cover -> NiceBusT4::set_mcu("4b", force);         
 
-# усилие при открытии
+# opening force
   - service: opening_force
     variables:
       force: string
@@ -70,45 +119,17 @@ api:
       lambda: |-
          nice_cover -> NiceBusT4::set_mcu("4a", force);
 
-  
-ota:
-  - platform: esphome # Для ESPHOME 2024.6.1
-
-# Set statul led for Wemos D1 mini
-status_led:
-  pin: 
-    number: D4
-    inverted: true
-  
-wifi:
-  ssid: !secret wifi_ssid
-  password:  !secret wifi_password
-      
-  
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    password: !secret ota_pass
-
-captive_portal:
-
-
-web_server:
-  port: 80
-#  js_include: "www.js"
-#  js_url: ""
-#  version: 2  
-
-# Кнопки для отправки команд
+# Buttons for sending commands
 button:
   - platform: template
-    name: Пошагово
+    name: Step-by-step
     id: sbs
     on_press:
       lambda: |-
            nice_cover -> NiceBusT4::send_cmd(bus_t4::SBS);
 
   - platform: template
-    name: Статус входов
+    name: Input status
     id: in_stat
     on_press:
       lambda: |-
@@ -118,7 +139,7 @@ button:
 # 55.0E.00.03.00.81.08.07.8D.04.0B.A9.00.01.01.A6.0E поиск положений
 
   - platform: template
-    name: Частичное открытие 1
+    name: Partial opening 1
     id: p_opn1
     on_press:
       lambda: |-
@@ -152,16 +173,16 @@ cover:
   device_class: gate
   id: nice_cover
   
-#  address: 0x0003            # адрес привода
-#  use_address: 0x0081        # адрес шлюза
+#  address: 0x0003            # drive address
+#  use_address: 0x0081        # gateway address
 
 
-# работаем с приёмником OXI
+# We work with the OXI receiver
 
-# отключаем автозакрытие ворот, если это нужно для погрузочно-разгрузочных работ
+# disable automatic closing of the gate, if necessary for loading and unloading operations
 switch:
   - platform: template
-    name: "Автозакрытие"
+    name: "Auto close"
     id: autoclose
     restore_mode: DISABLED
 #    optimistic: true

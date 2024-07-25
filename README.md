@@ -4,7 +4,7 @@ Russian translation available
 # ESPHOME component to control Nice drives via Bus T4 protocol
 # Nice Bus T4 protocol
 
-Allowes ESP8266 to communicate with Nice gate/garage openers using the Bus T4 port.
+Allowes WT32-ETH01 to communicate with Nice gate/garage openers using the Bus T4 port.
 Nice controll board must be equipped with BusT4 connector.
 
 # Current capabilities
@@ -21,7 +21,7 @@ Physical transmission often occurs through CAN transceivers, but there are no CA
 
 ![alt text](img/connector.jpg "BusT4 port with pinout")
 
-BusT4 RX/TX are running on 5V. ESP8266 RX/TX are using 3.3V - level shifter must be used!
+BusT4 RX/TX are running on 5V. WT32-ETH01 RX/TX are using 3.3V - level shifter must be used!
 BusT4 VCC pin provides power with voltage in range of 24V to 28V.
 Take extra care to follow the correct pinout - incorrect wiring to the BusT4 can immediately kill you Nice control board. Manually check voltage on the VCC port before connecting to the unit!
 

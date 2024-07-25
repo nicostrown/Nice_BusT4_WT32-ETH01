@@ -363,7 +363,7 @@ class NiceBusT4 : public Component, public Cover {
 
     void set_class_gate(uint8_t class_gate) { class_gate_ = class_gate; }
     
- /*   void set_update_interval(uint32_t update_interval) {  // интервал получения статуса привода
+ /*   void set_update_interval(uint32_t update_interval) {  // drive status acquisition interval
       this->update_interval_ = update_interval;
     }*/
 
@@ -372,20 +372,20 @@ class NiceBusT4 : public Component, public Cover {
   protected:
     void control(const cover::CoverCall &call) override;
     void send_command_(const uint8_t *data, uint8_t len);
-    void request_position(void);  // Запрос условного текущего положения привода
-    void update_position(uint16_t newpos);  // Обновление текущего положения привода
+    void request_position(void);  // Querying the conditional current position of the actuator
+    void update_position(uint16_t newpos);  // Update current actuator position
 
-    uint32_t last_position_time{0};  // Время последнего обновления текущего положения
+    uint32_t last_position_time{0};  // Time of last update of current position
     uint32_t update_interval_{500};
     uint32_t last_update_{0};
     uint32_t last_uart_byte_{0};
 
-    CoverOperation last_published_op;  // Последние опубликованные состояние и положение
+    CoverOperation last_published_op;  // Latest published status and position
     float last_published_pos{-1};
 
     void publish_state_if_changed(void);
 
-    uint8_t position_hook_type{IGNORE};  // Флаг и позиция установки заданного положения привода
+    uint8_t position_hook_type{IGNORE};  // Flag and position for setting the set position of the drive
     uint16_t position_hook_value;
 
     uint8_t class_gate_ = 0x55; // 0x01 sliding, 0x02 sectional, 0x03 swing, 0x04 barrier, 0x05 up-and-over
@@ -395,29 +395,29 @@ class NiceBusT4 : public Component, public Cover {
     bool init_oxi_flag = false;	
 
 	
-    // переменные для uart
+    // uart variables
     uint8_t _uart_nr;
     uart_t* _uart = nullptr;
-    uint16_t _max_opn = 0;  // максимальная позиция энкодера или таймера
-    uint16_t _pos_opn = 2048;  // позиция открытия энкодера или таймера, не для всех приводов.
-    uint16_t _pos_cls = 0;  // позиция закрытия энкодера или таймера, не для всех приводов
-    uint16_t _pos_usl = 0;  // условная текущая позиция энкодера или таймера, не для всех приводов	
-    // настройки заголовка формируемого пакета
-    uint8_t addr_from[2] = {0x00, 0x66}; //от кого пакет, адрес bust4 шлюза
-    uint8_t addr_to[2]; // = 0x00ff;	 // кому пакет, адрес контроллера привода, которым управляем
-    uint8_t addr_oxi[2]; // = 0x000a;	 // адрес приемника
+    uint16_t _max_opn = 0;  // maximum encoder or timer position
+    uint16_t _pos_opn = 2048;  // encoder or timer opening position, not for all drives
+    uint16_t _pos_cls = 0;  // encoder or timer close position, not for all drives
+    uint16_t _pos_usl = 0;  // conditional current position of encoder or timer, not for all drives
+    // packet header settings
+    uint16_t from_addr = 0x0066; // from whom the packet is, bust4 gateway address
+    uint16_t to_addr; // = 0x00ff; // to whom the packet is, the address of the drive controller that we control
+    uint16_t oxi_addr; // = 0x000a; // receiver address
 
-    std::vector<uint8_t> raw_cmd_prepare (std::string data);             // подготовка введенных пользователем данных для возможности отправки	
+    std::vector<uint8_t> raw_cmd_prepare (std::string data);             // preparing user-entered data for sending
 	
-    // генерация inf команд
-    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // все поля
-    std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd) {return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, 0x00, {0x00}, 0 );} // для команд без данных
+    // generating inf commands
+    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // all fields
+    std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd) {return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, 0x00, {0x00}, 0 );} // for commands without data
     std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, std::vector<uint8_t> data){
-	    return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // для команд c данными
+	    return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // for commands with data
     std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data){
-	    return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // для команд с адресом и без данных 	
+	    return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // for commands with address and without data 	
     	    
-    // генерация cmd команд
+    // generating cmd commands
     std::vector<uint8_t> gen_control_cmd(const uint8_t control_cmd);	    	
 	
     void init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device );
@@ -425,17 +425,17 @@ class NiceBusT4 : public Component, public Cover {
     void send_array_cmd (const uint8_t *data, size_t len);
 
 
-    void parse_status_packet (const std::vector<uint8_t> &data); // разбираем пакет статуса
+    void parse_status_packet (const std::vector<uint8_t> &data); // parsing the status package
     
-    void handle_char_(uint8_t c);                                         // обработчик полученного байта
-    void handle_datapoint_(const uint8_t *buffer, size_t len);          // обработчик полученных данных
-    bool validate_message_();                                         // функция проверки полученного сообщения
+    void handle_char_(uint8_t c);                                         // received byte handler
+    void handle_datapoint_(const uint8_t *buffer, size_t len);          // received data processor
+    bool validate_message_();                                         // function to check received message
 
-    std::vector<uint8_t> rx_message_;                          // здесь побайтно накапливается принятое сообщение
-    std::queue<std::vector<uint8_t>> tx_buffer_;             // очередь команд для отправки	
-    bool ready_to_tx_{true};	                           // флаг возможности отправлять команды
+    std::vector<uint8_t> rx_message_;                          // here the received message is accumulated byte by byte
+    std::queue<std::vector<uint8_t>> tx_buffer_;             // queue of commands to send
+    bool ready_to_tx_{true};	                           // flag for sending commands
 	
-    std::vector<uint8_t> manufacturer_ = {0x55, 0x55};  // при инициализации неизвестный производитель
+    std::vector<uint8_t> manufacturer_ = {0x55, 0x55};  // unknown manufacturer upon initialization
     std::vector<uint8_t> product_;
     std::vector<uint8_t> hardware_;
     std::vector<uint8_t> firmware_;
@@ -445,7 +445,7 @@ class NiceBusT4 : public Component, public Cover {
     std::vector<uint8_t> oxi_firmware;
     std::vector<uint8_t> oxi_description;	
 
-}; //класс
+}; //Class
 
 } // namespace bus_t4
 } // namespace esphome

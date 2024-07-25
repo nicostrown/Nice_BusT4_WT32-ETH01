@@ -403,9 +403,11 @@ class NiceBusT4 : public Component, public Cover {
     uint16_t _pos_cls = 0;  // encoder or timer close position, not for all drives
     uint16_t _pos_usl = 0;  // conditional current position of encoder or timer, not for all drives
     // packet header settings
-    uint16_t from_addr = 0x0066; // from whom the packet is, bust4 gateway address
-    uint16_t to_addr; // = 0x00ff; // to whom the packet is, the address of the drive controller that we control
-    uint16_t oxi_addr; // = 0x000a; // receiver address
+    uint8_t addr_from[2] = {0x00, 0x66}; // from whom is the package, bust4 gateway address
+    uint8_t addr_to[2]; // = 0x00ff;	 // to whom is the package, the address of the drive controller we are controlling
+    uint8_t addr_oxi[2]; // = 0x000a;	 // receiver address
+
+    std::vector<uint8_t> raw_cmd_prepare (std::string data);             // preparing user-entered data for sending
 
     // генерация inf команд
     std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // все поля

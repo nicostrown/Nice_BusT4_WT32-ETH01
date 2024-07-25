@@ -1,7 +1,7 @@
 Russian translation available
 [Russian](https://github.com/pruwait/Nice_BusT4)
 
-# ESPHOME component to control Nice drives via Bus T4 protocol
+# ESPHOME component to control Nice drives via Bus T4 protocol ESP32 board based
 # Nice Bus T4 protocol
 
 Allowes WT32-ETH01 to communicate with Nice gate/garage openers using the Bus T4 port.

@@ -1,12 +1,7 @@
 #include "nice-bust4.h"
 #include "esphome/core/log.h"
-#include "esphome/core/helpers.h"  // для использования вспомогательных функция работ со строками
-#include "driver/uart.h"
-
-
-
-
-
+#include "esphome/core/helpers.h"  // to use auxiliary functions for working with strings
+#include "driver/uart.h"           // functions for ESP32 board type 
 
 namespace esphome {
 namespace bus_t4 {
@@ -27,7 +22,7 @@ CoverTraits NiceBusT4::get_traits() {
 
 
 /*
-  дампы команд OVIEW
+  OVIEW command dumps
 
   SBS               55 0c 00 ff 00 66 01 05 9D 01 82 01 64 E6 0c
   STOP              55 0c 00 ff 00 66 01 05 9D 01 82 02 64 E5 0c
@@ -35,9 +30,6 @@ CoverTraits NiceBusT4::get_traits() {
   CLOSE             55 0c 00 ff 00 66 01 05 9D 01 82 04 64 E3 0c
   PARENTAL OPEN 1   55 0c 00 ff 00 66 01 05 9D 01 82 05 64 E2 0c
   PARENTAL OPEN 2   55 0c 00 ff 00 66 01 05 9D 01 82 06 64 E1 0c
-
-
-
 */
 
 void NiceBusT4::control(const CoverCall &call) {
@@ -54,9 +46,9 @@ void NiceBusT4::control(const CoverCall &call) {
       } else if (newpos == COVER_CLOSED) {
         if (current_operation != COVER_OPERATION_CLOSING) send_cmd(CLOSE);
 
-      } else { // Произвольное положение
+      } else { // Arbitrary position
         position_hook_value = (_pos_opn - _pos_cls) * newpos + _pos_cls;
-        ESP_LOGI(TAG, "Требуемое положение привода: %d", position_hook_value);
+        ESP_LOGI(TAG, "Required drive position: %d", position_hook_value);
         if (position_hook_value > _pos_usl) {
           position_hook_type = STOP_UP;
           if (current_operation != COVER_OPERATION_OPENING) send_cmd(OPEN);
@@ -74,7 +66,7 @@ void NiceBusT4::setup() {
 
  // _uart =  uart_init(_UART_NO, BAUD_WORK, SERIAL_8N1, SERIAL_6E2, TX_P, 256, false); //for ESP8266
   _uart =  uartBegin(_UART_NO, BAUD_WORK, SERIAL_8N1, RX_PIN, TX_PIN, 256, 256, false, 112); //for WT32
-  // кто в сети?
+  // who's online?
 //  this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
   
 
@@ -82,30 +74,30 @@ void NiceBusT4::setup() {
 
 void NiceBusT4::loop() {
 
-    if ((millis() - this->last_update_) > 10000) {    // каждые 10 секунд
-// если привод не определился с первого раза, попробуем позже
+    if ((millis() - this->last_update_) > 10000) {    // every 10 seconds
+// If the drive is not detected the first time, we will try later
         std::vector<uint8_t> unknown = {0x55, 0x55};
         if (this->init_ok == false) {
           this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-          this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //запрос продукта
+          this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
         }
         
         else if (this->class_gate_ == 0x55) {
 		init_device(this->addr_to[0], this->addr_to[1], 0x04);  
 	//        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //запрос продукта
+        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
 	}
         else if (this->manufacturer_ == unknown)  {
                 init_device(this->addr_to[0], this->addr_to[1], 0x04);  
         //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //запрос продукта
+        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
 		
         }
         this->last_update_ = millis();
-    }  // if  каждую минуту
+    }  // if  every minute
 
 	
-  // разрешаем отправку каждые 100 ms
+  // allow sending every 100 ms
     uint32_t now = millis();
   if (now - this->last_uart_byte_ > 100) {
     this->ready_to_tx_ = true;
@@ -114,21 +106,21 @@ void NiceBusT4::loop() {
 
 
   while (uartAvailable(_uart) > 0) {
-    //uint8_t c = (uint8_t)uart_Read(_uart);                // считываем байт
-    uint8_t c = (uint8_t)uartRead(_uart);                // считываем байт  
-    this->handle_char_(c);                                     // отправляем байт на обработку
+    //uint8_t c = (uint8_t)uart_Read(_uart);                // read the byte for ESP8266
+    uint8_t c = (uint8_t)uartRead(_uart);                // read the byte for ESP32
+    this->handle_char_(c);                                     // send the byte for processing
     this->last_uart_byte_ = now;
   } //while
 
-  if (this->ready_to_tx_) {   // если можно отправлять
-    if (!this->tx_buffer_.empty()) {  // если есть что отправлять
-      this->send_array_cmd(this->tx_buffer_.front()); // отправляем первую команду в очереди
+  if (this->ready_to_tx_) {   // if possible send
+    if (!this->tx_buffer_.empty()) {  // if you have anything to send
+      this->send_array_cmd(this->tx_buffer_.front()); // send the first command in the queue
       this->tx_buffer_.pop();
       this->ready_to_tx_ = false;
     }
   }
 
-  // Опрос текущего положения привода
+  // Poll of current actuator position
   if (!is_robus) {
   
   now = millis();
@@ -142,53 +134,53 @@ void NiceBusT4::loop() {
 
 
 void NiceBusT4::handle_char_(uint8_t c) {
-  this->rx_message_.push_back(c);                      // кидаем байт в конец полученного сообщения
-  if (!this->validate_message_()) {                    // проверяем получившееся сообщение
-    this->rx_message_.clear();                         // если проверка не прошла, то в сообщении мусор, нужно удалить
+  this->rx_message_.push_back(c);                      // throw a byte at the end of the received message
+  if (!this->validate_message_()) {                    // check the resulting message
+    this->rx_message_.clear();                         // if the verification fails, then the message is garbage, you need to delete it
   }
 }
 
 
-bool NiceBusT4::validate_message_() {                    // проверка получившегося сообщения
-  uint32_t at = this->rx_message_.size() - 1;       // номер последнего полученного байта
-  uint8_t *data = &this->rx_message_[0];               // указатель на первый байт сообщения
-  uint8_t new_byte = data[at];                      // последний полученный байт
+bool NiceBusT4::validate_message_() {                    // checking the received message
+  uint32_t at = this->rx_message_.size() - 1;       // number of the last byte received
+  uint8_t *data = &this->rx_message_[0];               // pointer to the first byte of the message
+  uint8_t new_byte = data[at];                      // last byte received
 
-  // Byte 0: HEADER1 (всегда 0x00)
+  // Byte 0: HEADER1 (always 0x00)
   if (at == 0)
     return new_byte == 0x00;
-  // Byte 1: HEADER2 (всегда 0x55)
+  // Byte 1: HEADER2 (always 0x55)
   if (at == 1)
     return new_byte == START_CODE;
 
-  // Byte 2: packet_size - количество байт дальше + 1
-  // Проверка не проводится
+  // Byte 2: packet_size - number of bytes further + 1
+  // No verification carried out
 
   if (at == 2)
     return true;
   uint8_t packet_size = data[2];
-  uint8_t length = (packet_size + 3); // длина ожидаемого сообщения понятна
+  uint8_t length = (packet_size + 3); // the length of the expected message is clear
 
 
-  // Byte 3: Серия (ряд) кому пакет
-  // Проверка не проводится
+  // Byte 3: Series (series) to whom package
+  // No verification carried out
   //  uint8_t command = data[3];
   if (at == 3)
     return true;
 
-  // Byte 4: Адрес кому пакет
-  // Byte 5: Серия (ряд) от кого пакет
-  // Byte 6: Адрес от кого пакет
-  // Byte 7: Тип сообшения CMD или INF
-  // Byte 8: Количество байт дальше за вычетом двух байт CRC в конце.
+ // Byte 4: Address to whom the package
+ // Byte 5: Series (row) from whom the packet
+ // Byte 6: Address of who the packet is from
+ // Byte 7: Message type CMD or INF
+ // Byte 8: The number of bytes further minus the two CRC bytes at the end.
 
   if (at <= 8)
-    // Проверка не проводится
+    // No verification carried out
     return true;
 
   uint8_t crc1 = (data[3] ^ data[4] ^ data[5] ^ data[6] ^ data[7] ^ data[8]);
 
-  // Byte 9: crc1 = XOR (Byte 3 : Byte 8) XOR шести предыдущих байт
+  // Byte 9: crc1 = XOR (Byte 3 : Byte 8) XOR the previous six bytes
   if (at == 9)
     if (data[9] != crc1) {
       ESP_LOGW(TAG, "Received invalid message checksum 1 %02X!=%02X", data[9], crc1);
@@ -197,11 +189,11 @@ bool NiceBusT4::validate_message_() {                    // проверка п�
   // Byte 10:
   // ...
 
-  // ждем пока поступят все данные пакета
+  // wait until all the package data arrives
   if (at  < length)
     return true;
 
-  // считаем crc2
+  // consider crc2
   uint8_t crc2 = data[10];
   for (uint8_t i = 11; i < length - 1; i++) {
     crc2 = (crc2 ^ data[i]);
@@ -219,90 +211,90 @@ bool NiceBusT4::validate_message_() {                    // проверка п�
     return false;
   }
 
-  // Если сюда дошли - правильное сообщение получено и лежит в буфере rx_message_
+  // If you got here, the correct message was received and is in the rx_message_ buffer
 
-  // Удаляем 0x00 в начале сообщения
+ // Remove 0x00 at the beginning of the message
   rx_message_.erase(rx_message_.begin());
 
-  // для вывода пакета в лог
+  // to output the package to the log
   std::string pretty_cmd = format_hex_pretty(rx_message_);
-  ESP_LOGI(TAG,  "Получен пакет: %S ", pretty_cmd.c_str() );
+  ESP_LOGI(TAG,  "Package received: %S ", pretty_cmd.c_str() );
 
-  // здесь что-то делаем с сообщением
+  // here we do something with the message
   parse_status_packet(rx_message_);
 
 
 
-  // возвращаем false чтобы обнулить rx buffer
+  // return false to reset rx buffer
   return false;
 
 }
 
 
-// разбираем полученные пакеты
+// parse the received packages
 void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
-  if ((data[1] == 0x0d) && (data[13] == 0xFD)) { // ошибка
-    ESP_LOGE(TAG,  "Команда недоступна для этого устройства" );
+  if ((data[1] == 0x0d) && (data[13] == 0xFD)) { // error
+    ESP_LOGE(TAG,  "Command not available for this device" );
   }
 
   if (((data[11] == GET - 0x80) || (data[11] == GET - 0x81)) && (data[13] == NOERR)) { // if evt
-  //  ESP_LOGD(TAG, "Получен пакет EVT с данными. Последняя ячейка %d ", data[12]);
+  //  ESP_LOGD(TAG, "EVT packet with data received. Last cell %d ", data[12]);
     std::vector<uint8_t> vec_data(this->rx_message_.begin() + 14, this->rx_message_.end() - 2);
     std::string str(this->rx_message_.begin() + 14, this->rx_message_.end() - 2);
-    ESP_LOGI(TAG,  "Строка с данными: %S ", str.c_str() );
+    ESP_LOGI(TAG,  "Data string: %S ", str.c_str() );
     std::string pretty_data = format_hex_pretty(vec_data);
-    ESP_LOGI(TAG,  "Данные HEX %S ", pretty_data.c_str() );
-    // получили пакет с данными EVT, начинаем разбирать
+    ESP_LOGI(TAG,  "HEX data %S ", pretty_data.c_str() );
+    // We received a package with EVT data, we are starting to disassemble it
 
-    if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == GET - 0x80) && (data[13] == NOERR)) { // интересуют завершенные ответы на запросы GET, пришедшие без ошибок от привода
-      ESP_LOGI(TAG,  "Получен ответ на запрос %X ", data[10] );
+    if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == GET - 0x80) && (data[13] == NOERR)) { // interested in completed responses to GET requests that arrived without errors from the drive
+      ESP_LOGI(TAG,  "Request response received %X ", data[10] );
       switch (data[10]) { // cmd_submnu
         case TYPE_M:
-          //           ESP_LOGI(TAG,  "Тип привода %X",  data[14]);
+          //           ESP_LOGI(TAG,  "type of drive %X",  data[14]);
           switch (data[14]) { //14
             case SLIDING:
               this->class_gate_ = SLIDING;
-              //        ESP_LOGD(TAG, "Тип ворот: Откатные %#X ", data[14]);
+              //        ESP_LOGD(TAG, "Gate type: Sliding %#X ", data[14]);
               break;
             case SECTIONAL:
               this->class_gate_ = SECTIONAL;
-              //        ESP_LOGD(TAG, "Тип ворот: Секционные %#X ", data[14]);
+              //        ESP_LOGD(TAG, "Gate type: Sectional %#X ", data[14]);
               break;
             case SWING:
               this->class_gate_ = SWING;
-              //        ESP_LOGD(TAG, "Тип ворот: Распашные %#X ", data[14]);
+              //        ESP_LOGD(TAG, "Gate type: Swing %#X ", data[14]);
               break;
             case BARRIER:
               this->class_gate_ = BARRIER;
-              //        ESP_LOGD(TAG, "Тип ворот: Шлагбаум %#X ", data[14]);
+              //        ESP_LOGD(TAG, "Gate type: Barrier %#X ", data[14]);
               break;
             case UPANDOVER:
               this->class_gate_ = UPANDOVER;
-              //        ESP_LOGD(TAG, "Тип ворот: Подъемно-поворотные %#X ", data[14]);
+              //        ESP_LOGD(TAG, "Gate type: Up and over %#X ", data[14]);
               break;
           }  // switch 14
           break; //  TYPE_M
-        case INF_IO: // ответ на запрос положения концевика откатных ворот
+        case INF_IO: // response to a request for the position of the sliding gate limit switch
           switch (data[16]) { //16
             case 0x00:
-              ESP_LOGI(TAG, "  Концевик не сработал ");
+              ESP_LOGI(TAG, "  The limit switch did not work ");
               break; // 0x00
             case 0x01:
-              ESP_LOGI(TAG, "  Концевик на закрытие ");
+              ESP_LOGI(TAG, "  Closing limit switch ");
               this->position = COVER_CLOSED;
               break; //  0x01
             case 0x02:
-              ESP_LOGI(TAG, "  Концевик на открытие ");
+              ESP_LOGI(TAG, "  Opening limit switch ");
               this->position = COVER_OPEN;
               break; // 0x02
 
           }  // switch 16
-          this->publish_state_if_changed();  // публикуем состояние
+          this->publish_state_if_changed();  // publish the status
 
           break; //  INF_IO
 
 
-        //положение максимального открытия энкодера, открытия, закрытия
+        //encoder maximum opening position, opening, closing
 
         case MAX_OPN:
           if (is_walky) {
@@ -312,18 +304,18 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           else {  
             this->_max_opn = (data[14] << 8) + data[15];
           }
-          ESP_LOGI(TAG, "Максимальное положение энкодера: %d", this->_max_opn);
+          ESP_LOGI(TAG, "Maximum encoder position: %d", this->_max_opn);
           break;
 
         case POS_MIN:
           this->_pos_cls = (data[14] << 8) + data[15];
-          ESP_LOGI(TAG, "Положение закрытых ворот: %d", this->_pos_cls);
+          ESP_LOGI(TAG, "Closed gate position: %d", this->_pos_cls);
           break;
 
         case POS_MAX:
-          if (((data[14] << 8) + data[15])>0x00) { // если в ответе от привода есть данные о положении открытия
+          if (((data[14] << 8) + data[15])>0x00) { // if the response from the actuator contains data about the opening position
           this->_pos_opn = (data[14] << 8) + data[15];}
-          ESP_LOGI(TAG, "Положение открытых ворот: %d", this->_pos_opn);
+          ESP_LOGI(TAG, "Gate open position: %d", this->_pos_opn);
           break;
 
         case CUR_POS:
@@ -336,46 +328,46 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         case INF_STATUS:
           switch (data[14]) {
             case OPENED:
-              ESP_LOGI(TAG, "  Ворота открыты");
+              ESP_LOGI(TAG, "  The gate is open");
               this->current_operation = COVER_OPERATION_IDLE;
               this->position = COVER_OPEN;
               break;
             case CLOSED:
-              ESP_LOGI(TAG, "  Ворота закрыты");
+              ESP_LOGI(TAG, "  The gate is closed");
               this->current_operation = COVER_OPERATION_IDLE;
               this->position = COVER_CLOSED;
               break;
             case 0x01:
-              ESP_LOGI(TAG, "  Ворота остановлены");
+              ESP_LOGI(TAG, "  The gate is stopped");
               this->current_operation = COVER_OPERATION_IDLE;
               request_position();
               break;
             case 0x00:
-              ESP_LOGI(TAG, "  Статус ворот неизвестен");
+              ESP_LOGI(TAG, "  Gate status unknown");
               this->current_operation = COVER_OPERATION_IDLE;
               request_position();
               break;
              case 0x0b:
-              ESP_LOGI(TAG, "  Поиск положений сделан");
+              ESP_LOGI(TAG, "  Search for provisions done");
               this->current_operation = COVER_OPERATION_IDLE;
               request_position();
               break;
               case STA_OPENING:
-              ESP_LOGI(TAG, "  Идёт открывание");
+              ESP_LOGI(TAG, "  Opening in progress");
               this->current_operation = COVER_OPERATION_OPENING;
               break;
               case STA_CLOSING:
-              ESP_LOGI(TAG, "  Идёт закрывание");
+              ESP_LOGI(TAG, "  Closing in progress");
               this->current_operation = COVER_OPERATION_CLOSING;
               break;
           }  // switch
-          this->publish_state_if_changed();  // публикуем состояние
+          this->publish_state_if_changed();  // publish the status
           break;
 
           //      default: // cmd_mnu
         case AUTOCLS:
           this->autocls_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Автозакрытие - L1: %S ", autocls_flag ? "Да" : "Нет");	
+	  ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");	
           break;
           
         case PH_CLS_ON:
@@ -387,57 +379,57 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           break;  
           
       } // switch cmd_submnu
-    } // if завершенные ответы на запросы GET, пришедшие без ошибок от привода
+    } // if completed responses to GET requests received without errors from the drive
 
-     if ((data[6] == INF) &&  (data[11] == GET - 0x81) && (data[13] == NOERR)) { // интересуют незавершенные ответы на запросы GET, пришедшие без ошибок от всех
-	ESP_LOGI(TAG,  "Получен незавершенный ответ на запрос %X, продолжение со смещением %X", data[10], data[12] );
-	     // повторяем команду с новым смещением
+     if ((data[6] == INF) &&  (data[11] == GET - 0x81) && (data[13] == NOERR)) { // interested in incomplete responses to GET requests that came without errors from everyone
+	ESP_LOGI(TAG,  "Received an incomplete response to request %X, continued at offset %X", data[10], data[12] );
+	     // repeat the command with the new offset
 	tx_buffer_.push(gen_inf_cmd(data[4], data[5], data[9], data[10], GET, data[12]));
      
-     } // незавершенные ответы на запросы GET, пришедшие без ошибок от привода
+     } // incomplete responses to GET requests that arrived without errors from the drive
 
 	  
     
-    if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == SET - 0x80) && (data[13] == NOERR)) { // интересуют ответы на запросы SET, пришедшие без ошибок от привода    
+    if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == SET - 0x80) && (data[13] == NOERR)) { // I'm interested in responses to SET requests that came without errors from the drive   
       switch (data[10]) { // cmd_submnu
         case AUTOCLS:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, AUTOCLS, GET)); // Автозакрытие
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, AUTOCLS, GET)); // Auto close
           break;
           
         case PH_CLS_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, PH_CLS_ON, GET)); // Закрыть после Фото
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, PH_CLS_ON, GET)); // Close after Photo
           break;  
           
         case ALW_CLS_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Всегда закрывать
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
       }// switch cmd_submnu
-    }// if ответы на запросы SET, пришедшие без ошибок от привода
+    }// if responses to SET requests received without errors from the drive
 
     if ((data[6] == INF) && (data[9] == FOR_ALL)  && ((data[11] == GET - 0x80) || (data[11] == GET - 0x81)) && (data[13] == NOERR)) { // интересуют FOR_ALL ответы на запросы GET, пришедшие без ошибок
 
       switch (data[10]) {
         case MAN:
-          //       ESP_LOGCONFIG(TAG, "  Производитель: %S ", str.c_str());
+          //       ESP_LOGCONFIG(TAG, "  Manufacturer: %S ", str.c_str());
           this->manufacturer_.assign(this->rx_message_.begin() + 14, this->rx_message_.end() - 2);
           break;
         case PRD:
-          if ((this->addr_oxi[0] == data[4]) && (this->addr_oxi[1] == data[5])) { // если пакет от приемника
-//            ESP_LOGCONFIG(TAG, "  Приёмник: %S ", str.c_str());
+          if ((this->addr_oxi[0] == data[4]) && (this->addr_oxi[1] == data[5])) { // if the packet is from the receiver
+//            ESP_LOGCONFIG(TAG, "  Receiver: %S ", str.c_str());
             this->oxi_product.assign(this->rx_message_.begin() + 14, this->rx_message_.end() - 2);
-          } // если пакет от приемника
-          else if ((this->addr_to[0] == data[4]) && (this->addr_to[1] == data[5])) { // если пакет от контроллера привода
-//            ESP_LOGCONFIG(TAG, "  Привод: %S ", str.c_str());
+          } // if the packet is from the receiver
+          else if ((this->addr_to[0] == data[4]) && (this->addr_to[1] == data[5])) { // if the package is from the drive controller
+//            ESP_LOGCONFIG(TAG, "  Drive unit: %S ", str.c_str());
             this->product_.assign(this->rx_message_.begin() + 14, this->rx_message_.end() - 2);
-            std::vector<uint8_t> wla1 = {0x57,0x4C,0x41,0x31,0x00,0x06,0x57}; // для понимания, что привод Walky
-            std::vector<uint8_t> ROBUSHSR10 = {0x52,0x4F,0x42,0x55,0x53,0x48,0x53,0x52,0x31,0x30,0x00}; // для понимания, что привод ROBUSHSR10
+            std::vector<uint8_t> wla1 = {0x57,0x4C,0x41,0x31,0x00,0x06,0x57}; // to understand that Walky drive
+            std::vector<uint8_t> ROBUSHSR10 = {0x52,0x4F,0x42,0x55,0x53,0x48,0x53,0x52,0x31,0x30,0x00}; // to understand that the ROBUSHSR10 drive
             if (this->product_ == wla1) { 
               this->is_walky = true;
-         //     ESP_LOGCONFIG(TAG, "  Привод WALKY!: %S ", str.c_str());
+         //     ESP_LOGCONFIG(TAG, "  WALKY drive!: %S ", str.c_str());
                                         }
             if (this->product_ == ROBUSHSR10) { 
               this->is_robus = true;
-          //    ESP_LOGCONFIG(TAG, "  Привод ROBUS!: %S ", str.c_str());
+          //    ESP_LOGCONFIG(TAG, "  Drive unit ROBUS!: %S ", str.c_str());
                                         }		  
 		  
           }

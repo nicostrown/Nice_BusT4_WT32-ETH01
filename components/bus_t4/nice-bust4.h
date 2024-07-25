@@ -262,80 +262,75 @@ enum setup_submnu : uint8_t {
         };
 	
 	
-/* Информация для лучшего понимания состава пакетов в протоколе */
-// тело пакета запроса CMD
-// пакеты с размером тела 0x0c=12 байт 
-	/*
+/* Information for a better understanding of the composition of packets in the protocol */
+
+// CMD request packet body
+// packets with body size 0x0c=12 bytes
+/*
 struct packet_cmd_body_t {
-  uint8_t byte_55;              // Заголовок, всегда 0x55
-  uint8_t pct_size1;                // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), для команд = 0x0c
-  uint8_t for_series;           // серия кому пакет ff = всем
-  uint8_t for_address;          // адрес кому пакет ff = всем
-  uint8_t from_series;           // серия от кого пакет
-  uint8_t from_address;          // адрес от кого пакет
-  uint8_t mes_type;           // тип сообщения, 1 = CMD, 8 = INF
-  uint8_t mes_size;              // количество байт дальше за вычетом двух байт CRC в конце, для команд = 5
-  uint8_t crc1;                // CRC1, XOR шести предыдущих байт
-  uint8_t cmd_mnu;                // Меню команды. cmd_mnu = 1 для команд управления
-  uint8_t setup_submnu;            // Подменю, в сочетании с группой команды определяет тип отправляемого сообщения
-  uint8_t control_cmd;            // Команда, которая должна быть выполнена
-  uint8_t offset;            //  Смещение для ответов. Влияет на запросы вроде списка поддерживаемых комманд
-  uint8_t crc2;            // crc2, XOR четырех предыдущих байт
-  uint8_t pct_size2;            // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), для команд = 0x0c
+  uint8_t byte_55; // Title, always 0x55
+  uint8_t pct_size1; // Packet body size (without header and CRC. Total number of bytes minus three), for commands = 0x0c
+  uint8_t for_series; // series to whom package ff = to all
+  uint8_t for_address; // address to whom package ff = to all
+  uint8_t from_series; // series from whom package
+  uint8_t from_address; // address from whom the package is
+  uint8_t mes_type; // message type, 1 = CMD, 8 = INF
+  uint8_t mes_size; // number of bytes further minus two CRC bytes at the end, for commands = 5
+  uint8_t crc1; // CRC1, XOR of the previous six bytes
+  uint8_t cmd_mnu; // Command menu. cmd_mnu = 1 for control commands
+  uint8_t setup_submnu; // The submenu, combined with the command group, determines the type of message to be sent.
+  uint8_t control_cmd; // Command to be executed
+  uint8_t offset; // Offset for responses. Affects queries like the list of supported commands
+  uint8_t crc2; // crc2, XOR the previous four bytes
+  uint8_t pct_size2; // packet body size (without header and CRC. Total number of bytes minus three), for commands = 0x0c
 
 };
 
-
-
-
-
-// тело пакета ответа RSP
-// пакеты с размером тела 0x0e=14 байт 
+// RSP response packet body
+// packets with body size 0x0e=14 bytes
 struct packet_rsp_body_t {
-  uint8_t byte_55;              // Заголовок, всегда 0x55
-  uint8_t pct_size1;                // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), >= 0x0e
-  uint8_t to_series;           // серия кому пакет ff = всем
-  uint8_t to_address;          // адрес кому пакет ff = всем
-  uint8_t from_series;           // серия от кого пакет
-  uint8_t from_address;          // адрес от кого пакет
-  uint8_t mes_type;           // тип сообщения, для этих пакетов всегда  8 = INF
-  uint8_t mes_size;              // количество байт дальше за вычетом двух байт CRC в конце, для команд = 5
-  uint8_t crc1;                // CRC1, XOR шести предыдущих байт
-  uint8_t cmd_mnu;                // Меню команды. cmd_mnu = 1 для команд управления
-  uint8_t sub_inf_cmd;            // Из какого подменю получил команду. Значение меньше на 0x80, чем первоначальное подменю
-  uint8_t sub_run_cmd;            // Какую команду получил. Значение больше на 0x80, чем полученная команда
-  uint8_t hb_data;             // данные, старший бит
-  uint8_t lb_data;            // данные, младший бит
-  uint8_t err;               // Ошибки
-  uint8_t crc2;            // crc2, XOR четырех предыдущих байт
-  uint8_t pct_size2;            // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), >= 0x0e
+  uint8_t byte_55; // Title, always 0x55
+  uint8_t pct_size1; // packet body size (without header and CRC. Total number of bytes minus three), >= 0x0e
+  uint8_t to_series; // series to whom package ff = to all
+  uint8_t to_address; // address to whom package ff = to all
+  uint8_t from_series; // series from whom package
+  uint8_t from_address; // address from whom the package is
+  uint8_t mes_type; // message type, for these packets always 8 = INF
+  uint8_t mes_size; // number of bytes further minus two CRC bytes at the end, for commands = 5
+  uint8_t crc1; // CRC1, XOR of the previous six bytes
+  uint8_t cmd_mnu; // Command menu. cmd_mnu = 1 for control commands
+  uint8_t sub_inf_cmd; // From which submenu the command was received. The value is 0x80 less than the original submenu
+  uint8_t sub_run_cmd; // What command did you get. The value is 0x80 greater than the received command
+  uint8_t hb_data; // data high bit
+  uint8_t lb_data; // data low bit
+  uint8_t err; // error
+  uint8_t crc2; // crc2, XOR the previous four bytes
+  uint8_t pct_size2; // packet body size (without header and CRC. Total number of bytes minus three), >= 0x0e
 
 };
 	
- // тело пакета ответа с данными EVT
+ // response packet body with EVT data
  
  struct packet_evt_body_t {
-  uint8_t byte_55;              // Заголовок, всегда 0x55
-  uint8_t pct_size1;                // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), >= 0x0e
-  uint8_t to_series;           // серия кому пакет ff = всем
-  uint8_t to_address;          // адрес кому пакет ff = всем
-  uint8_t from_series;           // серия от кого пакет
-  uint8_t from_address;          // адрес от кого пакет
-  uint8_t mes_type;           // тип сообщения, для этих пакетов всегда  8 = INF
-  uint8_t mes_size;              // количество байт дальше за вычетом двух байт CRC в конце, для команд = 5
-  uint8_t crc1;                // CRC1, XOR шести предыдущих байт
-  uint8_t whose;                // Чей пакет. Варианты: 00 - общий, 04 - контроллера привода, 0A - приемника OXI
-  uint8_t setup_submnu;            // Из какого подменю получил команду. Значение равно первоначальному подменю
-  uint8_t sub_run_cmd;            // На какую команду отвечаем. Значение меньше на 0x80, чем отправленная ранее команда
-  uint8_t next_data;            // Следующий блок данных
-  uint8_t err;               // Ошибки
-  uint8_t data_blk;            // Блок данных, может занимать несколько байт
-  uint8_t crc2;            // crc2, XOR всех предыдущих байт до девятого (Чей пакет)
-  uint8_t pct_size2;            // размер тела пакета (без заголовка и CRC. Общее количество  байт минус три), >= 0x0e
+  uint8_t byte_55; // Title, always 0x55
+  uint8_t pct_size1; // packet body size (without header and CRC. Total number of bytes minus three), >= 0x0e
+  uint8_t to_series; // series to whom package ff = to all
+  uint8_t to_address; // address to whom package ff = to all
+  uint8_t from_series; // series from whom package
+  uint8_t from_address; // address from whom the package is
+  uint8_t mes_type; // message type, for these packets always 8 = INF
+  uint8_t mes_size; // number of bytes further minus two CRC bytes at the end, for commands = 5
+  uint8_t crc1; // CRC1, XOR of the previous six bytes
+  uint8_t whose; // Whose package. Options: 00 - common, 04 - drive controller, 0A - OXI receiver
+  uint8_t setup_submnu; // From which submenu the command was received. The value is equal to the original submenu
+  uint8_t sub_run_cmd; // What command are we responding to? The value is 0x80 less than the previously sent command
+  uint8_t next_data; // Next block of data
+  uint8_t err; // error
+  uint8_t data_blk; // Data block, can take several bytes
+  uint8_t crc2; // crc2, XOR all previous bytes up to ninth (Whose packet)
+  uint8_t pct_size2; // packet body size (without header and CRC. Total number of bytes minus three), >= 0x0e
 
 };
- 
- 
 */
 
 enum position_hook_type : uint8_t {
@@ -344,26 +339,26 @@ enum position_hook_type : uint8_t {
   STOP_DOWN = 0x02
  };
 
-// создаю класс, наследую членов классов Component и Cover
+// I create a class, inherit members of the Component and Cover classes
 class NiceBusT4 : public Component, public Cover {
   public:
 	
-    // настройки привода
-    bool autocls_flag; // Автозакрывание - L1
-    bool photocls_flag; // Закрыть после фото - L2
-    bool alwayscls_flag; // Всегда закрывать - L3
-    bool init_ok = false; //  определение привода при включении
-    bool is_walky = false; // для walky отличается команда запроса положения
-    bool is_robus = false; // для robus не нужно переодически запрашивать позицию
+    //  drive settings
+    bool autocls_flag; // Auto close - L1
+    bool photocls_flag; // Close after photo - L2
+    bool alwayscls_flag; // Always Close - L3
+    bool init_ok = false; //  drive detection when turned on
+    bool is_walky = false; // the position request command is different for walky
+    bool is_robus = false; // for Robus there is no need to periodically request a position
 		
     void setup() override;
     void loop() override;
-    void dump_config() override; // для вывода в лог информации об оборудовнии
+    void dump_config() override; // to log information about equipment
 
     void send_raw_cmd(std::string data);
     void send_cmd(uint8_t data) {this->tx_buffer_.push(gen_control_cmd(data));}	
-    void send_inf_cmd(std::string to_addr, std::string whose, std::string command, std::string type_command,  std::string next_data, bool data_on, std::string data_command); // длинная команда
-    void set_mcu(std::string command, std::string data_command); // команда контроллеру мотора
+    void send_inf_cmd(std::string to_addr, std::string whose, std::string command, std::string type_command,  std::string next_data, bool data_on, std::string data_command); // long command
+    void set_mcu(std::string command, std::string data_command); // command to motor controller
 		
 
     void set_class_gate(uint8_t class_gate) { class_gate_ = class_gate; }

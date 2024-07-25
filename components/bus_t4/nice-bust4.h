@@ -407,17 +407,15 @@ class NiceBusT4 : public Component, public Cover {
     uint16_t to_addr; // = 0x00ff; // to whom the packet is, the address of the drive controller that we control
     uint16_t oxi_addr; // = 0x000a; // receiver address
 
-    std::vector<uint8_t> raw_cmd_prepare (std::string data);             // preparing user-entered data for sending
-	
-    // generating inf commands
-    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // all fields
-    std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd) {return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, 0x00, {0x00}, 0 );} // for commands without data
+    // генерация inf команд
+    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // все поля
+    std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd) {return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, 0x00, {0x00}, 0 );} // для команд без данных
     std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, std::vector<uint8_t> data){
-	    return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // for commands with data
+	    return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // для команд c данными
     std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data){
-	    return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // for commands with address and without data 	
+	    return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // для команд с адресом и без данных 	
     	    
-    // generating cmd commands
+    // генерация cmd команд
     std::vector<uint8_t> gen_control_cmd(const uint8_t control_cmd);	    	
 	
     void init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device );
@@ -425,17 +423,17 @@ class NiceBusT4 : public Component, public Cover {
     void send_array_cmd (const uint8_t *data, size_t len);
 
 
-    void parse_status_packet (const std::vector<uint8_t> &data); // parsing the status package
+    void parse_status_packet (const std::vector<uint8_t> &data); // разбираем пакет статуса
     
-    void handle_char_(uint8_t c);                                         // received byte handler
-    void handle_datapoint_(const uint8_t *buffer, size_t len);          // received data processor
-    bool validate_message_();                                         // function to check received message
+    void handle_char_(uint8_t c);                                         // обработчик полученного байта
+    void handle_datapoint_(const uint8_t *buffer, size_t len);          // обработчик полученных данных
+    bool validate_message_();                                         // функция проверки полученного сообщения
 
-    std::vector<uint8_t> rx_message_;                          // here the received message is accumulated byte by byte
-    std::queue<std::vector<uint8_t>> tx_buffer_;             // queue of commands to send
-    bool ready_to_tx_{true};	                           // flag for sending commands
+    std::vector<uint8_t> rx_message_;                          // здесь побайтно накапливается принятое сообщение
+    std::queue<std::vector<uint8_t>> tx_buffer_;             // очередь команд для отправки	
+    bool ready_to_tx_{true};	                           // флаг возможности отправлять команды
 	
-    std::vector<uint8_t> manufacturer_ = {0x55, 0x55};  // unknown manufacturer upon initialization
+    std::vector<uint8_t> manufacturer_ = {0x55, 0x55};  // при инициализации неизвестный производитель
     std::vector<uint8_t> product_;
     std::vector<uint8_t> hardware_;
     std::vector<uint8_t> firmware_;
@@ -445,7 +443,7 @@ class NiceBusT4 : public Component, public Cover {
     std::vector<uint8_t> oxi_firmware;
     std::vector<uint8_t> oxi_description;	
 
-}; //Class
+}; //класс
 
 } // namespace bus_t4
 } // namespace esphome

@@ -19,13 +19,9 @@ This is a modified UART 19200 8n1 with a uart break duration of 519us-590us befo
 You can connect several devices; for this, CAN-BUS transceivers are added to the physical layer.
 Physical transmission often occurs through CAN transceivers, but there are no CAN frames.
 
-![alt text](img/connector.jpg "BusT4 port with pinout")
-
 BusT4 RX/TX are running on 5V. WT32-ETH01 RX/TX are using 3.3V - level shifter must be used!
 BusT4 VCC pin provides power with voltage in range of 24V to 28V.
 Take extra care to follow the correct pinout - incorrect wiring to the BusT4 can immediately kill you Nice control board. Manually check voltage on the VCC port before connecting to the unit!
-
-![alt text](img/diagram.jpg "Example of connection with Wemos D1 mini, logic level shifter and DC-DC buck step down conventer")
 
 The component supports sending an arbitrary command to the drive via the ESPHome service:
 ```
@@ -35,4 +31,5 @@ Close: 55 0c 00 03 05 81 01 05 83 01 82 04 64 e3 0c
 Stop:  55 0c 00 03 00 81 01 05 86 01 82 02 64 e5 0c
 ```
 
-Original version available at https://github.com/pruwait/Nice_BusT4, most of credit goes to `@pruwait`.
+Original version on Wemos D1 Mini available at https://github.com/pruwait/Nice_BusT4, most of credit goes to `@pruwait`.
+English version on Wemos D1 Mini available at https://github.com/xdanik/Nice_BusT4.

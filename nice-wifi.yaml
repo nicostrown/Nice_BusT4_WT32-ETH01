@@ -2,7 +2,7 @@
 #Tested on WT32_ETH01 & Nice Robus 400
 
 substitutions:
-  device_name: "nice-robus-400-busT4-uart"
+  device_name: "nice-robus-400-bust4-uart"
   device_name_friendly: "Nice Robus 400"
   api_password: !secret     wt32_eth01_api_password
   ota_password: !secret     wt32_eth01_ota_password

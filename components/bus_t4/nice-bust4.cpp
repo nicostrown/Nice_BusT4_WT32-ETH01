@@ -1034,7 +1034,7 @@ void NiceBusT4::update_position(uint16_t newpos) {
   }
 }
 
-// Публикация состояния ворот при изменении
+// Publish gate status when changed
 void NiceBusT4::publish_state_if_changed(void) {
   if (current_operation == COVER_OPERATION_IDLE) position_hook_type = IGNORE;
   if (last_published_op != current_operation || last_published_pos != position) {

@@ -824,9 +824,9 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   std::string oxi_dsc_str(this->oxi_description.begin(), this->oxi_description.end());
   ESP_LOGCONFIG(TAG, "  Receiver Description: %S ", oxi_dsc_str.c_str());
  
-  ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Да" : "Нет");
-  ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Да" : "Нет");
-  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Да" : "Нет");
+  ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");
+  ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
+  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
   
 }
 

@@ -1047,11 +1047,11 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, DSC, GET, 0x00)); // request description  
   }
 
-  for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
-	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
-	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
-        delayMicroseconds(1000000);
-    }
+ //  for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
+	// send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+	// send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
+ //        delayMicroseconds(1000000);
+ //    }
 }
 
 // Querying the conditional current position of the actuator

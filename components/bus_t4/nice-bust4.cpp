@@ -997,11 +997,11 @@ void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string
 }
 
 //check all cmd
-void NiceBusT4::check_cmd {
-    int poczatek = 0x70;
-    int koniec = 0x9F;
+void NiceBusT4::check_cmd() {
+    //int poczatek = 0x70;
+    //int koniec = 0x9F;
 
-    for(int licznik = poczatek; licznik <= koniec; ++licznik) {
+    for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
 	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
 	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
         delayMicroseconds(1000000);

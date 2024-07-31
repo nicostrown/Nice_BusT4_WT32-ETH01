@@ -372,10 +372,12 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           
         case PH_CLS_ON:
           this->photocls_flag = data[14];
+	  ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
           break;  
           
         case ALW_CLS_ON:
           this->alwayscls_flag = data[14];
+	  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
           break;  
           
       } // switch cmd_submnu

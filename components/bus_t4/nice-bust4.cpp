@@ -1001,8 +1001,9 @@ void NiceBusT4::check_cmd {
     int początek = 0x70;
     int koniec = 0x9F;
 
-    for(int licznik = początek; licznik <= koniec; ++licznik) {
-	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01")
+    for(int licznik = poczatek; licznik <= koniec; ++licznik) {
+	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
         delayMicroseconds(1000000);
     }
 }

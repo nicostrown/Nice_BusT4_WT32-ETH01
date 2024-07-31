@@ -996,6 +996,16 @@ void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string
   } // else
 }
 
+//check all cmd
+void NiceBusT4::check_cmd {
+    int początek = 0x70;
+    int koniec = 0x9F;
+
+    for(int licznik = początek; licznik <= koniec; ++licznik) {
+	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01")
+        delayMicroseconds(1000000);
+    }
+}
 // generating and sending installation commands to the drive controller from yaml configuration with minimal parameters
 void NiceBusT4::set_mcu(std::string command, std::string data_command) {
     std::vector < uint8_t > v_command = raw_cmd_prepare (command);

@@ -835,7 +835,7 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
 
 //formation of a management command
 std::vector<uint8_t> NiceBusT4::gen_control_cmd(const uint8_t control_cmd) {
-  std::vector<uint8_t> frame = {this->addr_to[0], this->addr_to[1], this->addr_from[0], this->addr_from[1]}; // заголовок
+  std::vector<uint8_t> frame = {this->addr_to[0], this->addr_to[1], this->addr_from[0], this->addr_from[1]}; // tytuł
   frame.push_back(CMD);  // 0x01
   frame.push_back(0x05);
   uint8_t crc1 = (frame[0] ^ frame[1] ^ frame[2] ^ frame[3] ^ frame[4] ^ frame[5]);

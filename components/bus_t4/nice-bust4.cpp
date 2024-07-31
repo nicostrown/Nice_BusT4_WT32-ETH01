@@ -402,7 +402,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	      
         case SLAVE_ON:
           this->slave_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slave_flag ? "Yes" : "No");
+	  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
           break; 
 
 

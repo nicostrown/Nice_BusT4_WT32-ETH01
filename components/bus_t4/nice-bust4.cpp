@@ -998,7 +998,7 @@ void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string
 
 //check all cmd
 void NiceBusT4::check_cmd {
-    int początek = 0x70;
+    int poczatek = 0x70;
     int koniec = 0x9F;
 
     for(int licznik = poczatek; licznik <= koniec; ++licznik) {

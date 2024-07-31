@@ -191,6 +191,7 @@ enum setup_submnu : uint8_t {
             SLOW_ON = 0xA2, // Main parameters - Slowdown
             BLINK_ON = 0x94, // Basic parameters - Blink - Active
             BLINK_OPN_TIME = 0x95, // Basic parameters - Blink - Opening time
+	    SLAVE_ON = 0x98,       // Slave mode Active
             BLINK_CLS_TIME = 0x99, // Basic parameters - Flicker - Time on closing
 
             TYPE_M = 0x00, // Actuator type query

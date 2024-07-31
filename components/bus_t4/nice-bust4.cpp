@@ -409,6 +409,10 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         case ALW_CLS_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
+
+	case BLINK_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
+          break;        
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
 

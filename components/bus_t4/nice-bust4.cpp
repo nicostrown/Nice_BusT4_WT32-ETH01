@@ -382,7 +382,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 
 	case START_ON:
           this->peak_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Pre-flasing - L5: %S ", peak_flag ? "Yes" : "No");
+	  ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
           break; 
 	      
 	case BLINK_ON:

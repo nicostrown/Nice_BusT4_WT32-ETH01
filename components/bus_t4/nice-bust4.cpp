@@ -1023,6 +1023,10 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, AUTOCLS, GET, 0x00)); // Auto close
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, PH_CLS_ON, GET, 0x00)); // Close after Photo
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, ALW_CLS_ON, GET, 0x00)); // Always close
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, START_ON, GET, 0x00)); // Peak
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, BLINK_ON, GET, 0x00)); // Pre-flashing
+    //tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, BLINK_ON, GET, 0x00)); // Pre-flashing
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SLAVE_ON, GET, 0x00)); // Slave mode
   }
   if (device == FOR_OXI) {
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, PRD, GET, 0x00)); // product request

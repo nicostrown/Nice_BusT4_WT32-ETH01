@@ -871,7 +871,7 @@ std::vector<uint8_t> NiceBusT4::gen_inf_cmd(const uint8_t to_addr1, const uint8_
   frame.push_back(next_data); // next_data
   frame.push_back(len);
   if (len > 0) {
-    frame.insert(frame.end(), data.begin(), data.end()); // блок данных
+    frame.insert(frame.end(), data.begin(), data.end()); // blok danych
   }
   uint8_t crc2 = frame[7];
   for (size_t i = 8; i < 12 + len; i++) {

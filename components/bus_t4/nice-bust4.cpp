@@ -997,16 +997,17 @@ void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string
 }
 
 //check all cmd
-void NiceBusT4::check_cmd() {
-    //int poczatek = 0x70;
-    //int koniec = 0x9F;
+// void NiceBusT4::check_cmd() {
+//     //int poczatek = 0x70;
+//     //int koniec = 0x9F;
 
-    for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
-	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
-	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
-        delayMicroseconds(1000000);
-    }
-}
+//     for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
+// 	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+// 	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
+//         delayMicroseconds(1000000);
+//     }
+// }
+
 // generating and sending installation commands to the drive controller from yaml configuration with minimal parameters
 void NiceBusT4::set_mcu(std::string command, std::string data_command) {
     std::vector < uint8_t > v_command = raw_cmd_prepare (command);
@@ -1045,7 +1046,12 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, FRM, GET, 0x00)); // firmware request    
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, DSC, GET, 0x00)); // request description  
   }
-  
+
+  for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
+	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
+        delayMicroseconds(1000000);
+    }
 }
 
 // Querying the conditional current position of the actuator

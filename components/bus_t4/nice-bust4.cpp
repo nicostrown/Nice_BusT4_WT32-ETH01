@@ -380,6 +380,11 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
           break;     
 
+	case STANDBY_ON:
+          this->standby_flag = data[14];
+	  ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");
+          break; 
+	      
 	case START_ON:
           this->peak_flag = data[14];
 	  ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
@@ -388,6 +393,16 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	case BLINK_ON:
           this->preflashing_flag = data[14];
 	  ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
+          break; 
+
+   //      case SLAVE_ON:
+   //        this->close_to_popen_flag = data[14];
+	  // ESP_LOGCONFIG(TAG, "  Close becomes Partial open- L7: %S ", close_to_popen_flag ? "Yes" : "No");
+   //        break; 
+	      
+        case SLAVE_ON:
+          this->slave_flag = data[14];
+	  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slave_flag ? "Yes" : "No");
           break; 
 
 
@@ -417,13 +432,27 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         case ALW_CLS_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
+
+	case STANDBY_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, STANDBY_ON, GET)); // Pre-flasing
+          break;
+	      
 	case START_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // Pre-flasing
           break;
 	      
 	case BLINK_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
-          break;        
+          break;   
+
+	// case BLINK_ON:
+ //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
+ //          break;
+
+	case SLAVE_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
+          break;
+	      
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
 
@@ -848,9 +877,12 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
+  ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");	
   ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
-  
+  ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
+  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
+	
 }
 
 

@@ -347,6 +347,11 @@ class NiceBusT4 : public Component, public Cover {
     bool autocls_flag; // Auto close - L1
     bool photocls_flag; // Close after photo - L2
     bool alwayscls_flag; // Always Close - L3
+    bool standby_flag; // Stand-By - L4
+    bool peak_flag; // Peak - L5
+    bool preflashing_flag; //Pre-flashing - L6
+    bool close_to_popen_flag; //“Close” becomes “Partial open” - L7
+    bool slavemode_flag; //“Slave” mode - L8
     bool init_ok = false; //  drive detection when turned on
     bool is_walky = false; // the position request command is different for walky
     bool is_robus = false; // for Robus there is no need to periodically request a position

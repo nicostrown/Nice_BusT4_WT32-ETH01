@@ -379,12 +379,19 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           this->alwayscls_flag = data[14];
 	  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
           break;     
+
+	case START_ON:
+          this->peak_flag = data[14];
+	  ESP_LOGCONFIG(TAG, "  Pre-flasing - L5: %S ", peak_flag ? "Yes" : "No");
+          break; 
 	      
 	case BLINK_ON:
           this->preflashing_flag = data[14];
 	  ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
           break; 
-          
+
+
+	      
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
 
@@ -410,7 +417,10 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         case ALW_CLS_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
-
+	case START_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // Pre-flasing
+          break;
+	      
 	case BLINK_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
           break;        

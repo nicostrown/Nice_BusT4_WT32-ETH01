@@ -179,6 +179,7 @@ enum setup_submnu : uint8_t {
             PH_CLS_TIME = 0x85, // Basic options - Close after Photo - Waiting time
             ALW_CLS_ON = 0x88, // Basic options - Always close - Active
             ALW_CLS_VAR = 0x8A, // Basic options - Always close - Mode
+            STANDBY_ON = 0x8C, // Stand-by Active
             ALW_CLS_TIME = 0x89, // Basic options - Always close - Timeout
             OPN_PWR = 0x4A, // Basic parameters - Force control - Opening force
             CLS_PWR = 0x4B, // Basic parameters - Force control - Closing force

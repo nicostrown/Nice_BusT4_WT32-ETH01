@@ -405,7 +405,11 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
           break; 
 
-
+	//level2 settings:
+	case P_TIME:
+          this->current_pause_time_level = data[14];
+	  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level );
+          break; 
 	      
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
@@ -452,6 +456,10 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	case SLAVE_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
           break;
+
+	case P_TIME:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // Pre-flasing
+          break;	      
 	      
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
@@ -882,6 +890,8 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
+
+  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level);
 	
 }
 
@@ -1067,10 +1077,15 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, AUTOCLS, GET, 0x00)); // Auto close
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, PH_CLS_ON, GET, 0x00)); // Close after Photo
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, ALW_CLS_ON, GET, 0x00)); // Always close
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, STANDBY_ON, GET, 0x00)); // Stand by	  
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, START_ON, GET, 0x00)); // Peak
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, BLINK_ON, GET, 0x00)); // Pre-flashing
-    //tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, BLINK_ON, GET, 0x00)); // Pre-flashing
+    //tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, CLOSE_TO_POPEN_ON, GET, 0x00)); // Close to Partial open
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SLAVE_ON, GET, 0x00)); // Slave mode
+
+    //level 2 settings  
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Slave mode	  
+	  
   }
   if (device == FOR_OXI) {
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, PRD, GET, 0x00)); // product request

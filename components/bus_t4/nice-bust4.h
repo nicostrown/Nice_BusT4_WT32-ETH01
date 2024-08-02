@@ -355,7 +355,8 @@ class NiceBusT4 : public Component, public Cover {
     bool close_to_popen_flag; //“Close” becomes “Partial open” - L7
     bool slavemode_flag; //“Slave” mode - L8
 
-    uint8_t current_pause_time_level; l2L1
+    //level 2 settings
+    uint8_t current_pause_time_level; l2L1 - Pause time
     
     bool init_ok = false; //  drive detection when turned on
     bool is_walky = false; // the position request command is different for walky

@@ -354,6 +354,9 @@ class NiceBusT4 : public Component, public Cover {
     bool preflashing_flag; //Pre-flashing - L6
     bool close_to_popen_flag; //“Close” becomes “Partial open” - L7
     bool slavemode_flag; //“Slave” mode - L8
+
+    uint8_t current_pause_time_level; l2L1
+    
     bool init_ok = false; //  drive detection when turned on
     bool is_walky = false; // the position request command is different for walky
     bool is_robus = false; // for Robus there is no need to periodically request a position

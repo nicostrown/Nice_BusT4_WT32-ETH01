@@ -1,20 +1,21 @@
-#Sends packets via uart to the Nice BUS T4
-#Tested on WT32_ETH01 & Nice Robus 400
+#sends packets via uart to the Nice BUS T4
+#test on Wemos D1 mini
 
 substitutions:
   device_name: "nice-robus-400-bust4-uart"
   device_name_friendly: "Nice Robus 400"
   api_password: !secret     wt32_eth01_api_password
   ota_password: !secret     wt32_eth01_ota_password
-  #mqtt_broker_address: !secret   mqtt_broker_address
-  led_gpio:                 GPIO5 #not applicable on WT32-ETH01 without additional LED
+  mqtt_broker_address: !secret   mqtt_broker_address
+  led_gpio:                 GPIO2
+  DS18B20_pin:              GPIO4
+  light_relay_pin:          GPIO14
   #device_ip: 192.168.5.60
 
-esphome:
-  name: ${device_name}
-  friendly_name: ${device_name_friendly}
-  #platform: ESP32
-  #board: esp-wrover-kit
+# esphome:
+  # name: ${device_name}
+  # friendly_name: ${device_name_friendly}
+
 
 esp32:
   board: wt32-eth01
@@ -34,35 +35,47 @@ ethernet:
   #  static_ip: $device_ip
   #  gateway: $network_gateway
   #  subnet: $network_subnet
+  
+# Enable logging
+logger:
+  level: DEBUG
+#  level: VERBOSE
+  baud_rate: 0
 
 ota:
   - platform: esphome
     password: $ota_password
 
-# Set statul led for WT32-ETH01
+# Enable web server (can be disabled)
+web_server:
+  port: 80
+
 status_led:
   pin: 
-    number: 12
+    number: ${led_gpio}
     inverted: true
+
+# external_components:
+#   - source: 
+#       type: local
+#       path: ./components/bus_t4
 
 external_components:
   - source:
       type: git
       url: https://github.com/karol27/Nice_BusT4_WT32-ETH01
     refresh: 0s
-    
-# Enable logging
-logger:
-  level: DEBUG
-  baud_rate: 0
 
-#captive_portal:
+#wifi:
+#  ssid: !secret wifi_ssid
+#  password: !secret wifi_password
 
-web_server:
-  port: 80
-#  js_include: "www.js"
-#  js_url: ""
-#  version: 2  
+#  # Enable fallback hotspot (captive portal) in case wifi connection fails
+#  ap:
+#    ssid: "Nice Fallback Hotspot"
+#    password: "SKXZ6FPAdwIC"
+
+# captive_portal:
 
 # Enable Home Assistant API
 api:
@@ -76,7 +89,7 @@ api:
         raw_cmd: string
     then:
       lambda: |-
-         nice_cover -> NiceBusT4::send_raw_cmd(raw_cmd);
+         my_nice_cover -> NiceBusT4::send_raw_cmd(raw_cmd);
          
   - service: send_inf_command
     variables:
@@ -89,19 +102,7 @@ api:
        data_command: string
     then:
       lambda: |-
-        nice_cover -> NiceBusT4::send_inf_cmd(to_addr, whose, command, type_command, next_data, data_on, data_command);
-
-# sash length recognition
-  - service: gate_length_recognition
-    then:
-      lambda: |-
-         nice_cover -> NiceBusT4::set_mcu("0b","01");
-
-# BlueBus device recognition
-  - service: devices_recognition
-    then:
-      lambda: |-
-         nice_cover -> NiceBusT4::set_mcu("0a","01");         
+        my_nice_cover -> NiceBusT4::send_inf_cmd(to_addr, whose, command, type_command, next_data, data_on, data_command);
 
 # closing force
   - service: closing_force
@@ -109,7 +110,7 @@ api:
       force: string
     then:
       lambda: |-
-         nice_cover -> NiceBusT4::set_mcu("4b", force);         
+         my_nice_cover -> NiceBusT4::set_mcu("4b", force);         
 
 # opening force
   - service: opening_force
@@ -117,7 +118,20 @@ api:
       force: string
     then:
       lambda: |-
-         nice_cover -> NiceBusT4::set_mcu("4a", force);
+         my_nice_cover -> NiceBusT4::set_mcu("4a", force);
+
+# sash length recognition
+  - service: gate_length_recognition
+    then:
+      lambda: |-
+         my_nice_cover -> NiceBusT4::set_mcu("0b","01");
+
+# BlueBus device recognition
+  - service: devices_recognition
+    then:
+      lambda: |-
+         my_nice_cover -> NiceBusT4::set_mcu("0a","01"); 
+
 
 # Buttons for sending commands
 button:
@@ -126,90 +140,486 @@ button:
     id: sbs
     on_press:
       lambda: |-
-           nice_cover -> NiceBusT4::send_cmd(bus_t4::SBS);
+           my_nice_cover -> NiceBusT4::send_cmd(bus_t4::SBS);
 
-  - platform: template
-    name: Input status
-    id: in_stat
-    on_press:
-      lambda: |-
-           nice_cover -> NiceBusT4::send_raw_cmd("55.0D.00.03.00.66.08.06.6B.04.D0.99.00.00.4D.0D");
-
-#         nice_cover -> NiceBusT4::send_raw_cmd("55 0c 00 ff 00 66 01 05 9D 01 82 01 64 E6 0c");
-# 55.0E.00.03.00.81.08.07.8D.04.0B.A9.00.01.01.A6.0E search for provisions
+#         my_nice_cover -> NiceBusT4::send_raw_cmd("55 0c 00 ff 00 66 01 05 9D 01 82 01 64 E6 0c");
 
   - platform: template
     name: Partial opening 1
     id: p_opn1
     on_press:
       lambda: |-
-         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN1);
-                      
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::STOP);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::OPEN);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::CLOSE);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN2);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN3);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN4);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN5);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN6);
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLK_OPN);  # Unlock and open
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::CLS_LOCK);  # Close and block
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLCK_CLS); # Unlock and Close
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::LOCK);      # Block
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLOCK);    # Unblock
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_SBS);  # Host SBS
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_OPN);  # Host Open
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_CLS);  # Host Close
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_SBS); # Slave SBS
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_OPN); # Slave Open
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_CLS); # Slave Close
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::AUTO_ON);   # Auto-opening active?
-#         nice_cover -> NiceBusT4::send_cmd(bus_t4::AUTO_OFF);  # Auto-opening is inactive?
+         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN1);
 
-cover:
-- platform: bus_t4
-  name: "Nice Cover"
-  device_class: gate
-  id: nice_cover
-  
-#  address: 0x0003            # drive address
-#  use_address: 0x0081        # gateway address
-
-
-# We work with the OXI receiver
-
-# disable automatic closing of the gate, if necessary for loading and unloading operations
-switch:
   - platform: template
-    name: "Auto close"
-    id: autoclose
+    name: Input status
+    id: in_stat
+    on_press:
+      lambda: |-
+           my_nice_cover -> NiceBusT4::send_raw_cmd("55.0D.00.03.00.66.08.06.6B.04.D0.99.00.00.4D.0D");
+  
+  # - platform: template
+  #   name: test_check_cmd
+  #   id: p_opn12
+  #   on_press:
+  #     lambda: |-
+  #        my_nice_cover -> NiceBusT4::check_cmd();
+                      
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::STOP);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::OPEN);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::CLOSE);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN2);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN3);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN4);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN5);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::P_OPN6);
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLK_OPN);  # Unlock and open 
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::CLS_LOCK);  # Close and Lock 
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLCK_CLS); # Unlock and Close
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::LOCK);      # Lock
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::UNLOCK);    # UnLock
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_SBS);  # Host SBS
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_OPN);  # Host Open
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::HOST_CLS);  # Host Close
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_SBS); # Slave SBS
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_OPN); # Slave Open
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::SLAVE_CLS); # Slave Close
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::AUTO_ON);   # Auto-opening active
+#         my_nice_cover -> NiceBusT4::send_cmd(bus_t4::AUTO_OFF);  # Auto-opening is inactive
+
+
+
+switch:
+  - platform: restart
+    name: "Nice WT32-ETH01 Restart"
+
+# # disable automatic closing of the gate, if necessary for loading and unloading operations?
+# #auto_close & close_ater_photo
+#   - platform: template
+#     name: "Auto close"
+#     id: autoclose_test
+#     restore_mode: DISABLED
+# #    optimistic: true
+#     lambda: |-
+#       if (my_nice_cover -> NiceBusT4::autocls_flag) {
+#         return true;
+#       } else {
+#         return false;
+#       }
+#     turn_on_action:
+#       lambda: |-
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "01");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "01");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");                
+#     turn_off_action:
+#       lambda: |-
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "00");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "00");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");
+#         my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");                
+
+  - platform: gpio
+    name: "Swiatlo brama"
+    pin: ${light_relay_pin}
+
+  - platform: template
+    name: "l1L1 - Auto close" #l1L2 - level 1, option L2
+    id: auto_close
     restore_mode: DISABLED
 #    optimistic: true
     lambda: |-
-      if (nice_cover -> NiceBusT4::autocls_flag) {
+      if (my_nice_cover -> NiceBusT4::autocls_flag) {
         return true;
       } else {
         return false;
       }
     turn_on_action:
       lambda: |-
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "01");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "01");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");                
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");              
     turn_off_action:
       lambda: |-
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "00");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "00");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");
-        nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");                        
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");          
+
+  - platform: template
+    name: "l1L2 - Close after photo"
+    id: close_after_photo
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::photocls_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");        
+
+  - platform: template
+    name: "l1L3 - Always close Active"
+    id: always_close
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::alwayscls_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "88", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "88", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "88", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "88", "99", "00", true, "01");
+
+  - platform: template
+    name: "l1L4 - StandBy"
+    id: standby
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::standby_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "8C", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "8C", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "8C", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "8C", "99", "00", true, "01");
+  
+  - platform: template
+    name: "l1L5 - Peak"
+    id: peak
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::peak_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "90", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "90", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "90", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "90", "99", "00", true, "01");
+
+  - platform: template
+    name: "l1L6 - Pre-flashing"
+    id: pre_flashing
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::preflashing_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "94", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "94", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "94", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "94", "99", "00", true, "01");
+
+  - platform: template
+    name: "l1L8 - Slave mode"
+    id: slave_mode
+    restore_mode: DISABLED
+#    optimistic: true
+    lambda: |-
+      if (my_nice_cover -> NiceBusT4::slavemode_flag) {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "98", "a9", "00", true, "01");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "98", "99", "00", true, "01");              
+    turn_off_action:
+      lambda: |-
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "98", "a9", "00", true, "00");
+        my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "98", "99", "00", true, "01");
+
+    # turn_on_action:
+    #   lambda: |-
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "01"); // command = 80 Auto Close, type_command = a9 - wykonaj?, data_command = 01 - włącz?
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "01"); // command = 84 Close after Photo
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01"); // command = 80 Auto Close, type_command = 99 - pobierz status?, data_command = 01 - ?
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01");                
+    # turn_off_action:
+    #   lambda: |-
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "a9", "00", true, "00"); // command = 80 Auto Close, type_command = a9, data_command = 00 - wyłącz?
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "a9", "00", true, "00");
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "80", "99", "00", true, "01");
+    #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "84", "99", "00", true, "01"); 
+
+# cover:
+cover:
+  - platform: bus_t4
+    name: "Nice RB400"
+    id: my_nice_cover
+    device_class: gate
+  #  address: 0x0003            # drive address
+  #  use_address: 0x0081        # gateway address
 
 
-              
-#script:
-#  - id: send_cmd
-#    then:
-#      - switch.turn_on: my_switch
-#      - delay: 1s
-#      - switch.turn_off: my_switch              
+# one_wire:
+#   - platform: gpio
+#     pin: ${DS18B20_pin}
+
+# sensor:
+#   - platform: dallas_temp
+#     address: 0x1234567812345628
+#     name: "Gate temperature"
+#     update_interval: 120s
+
+# on_boot:
+#   priority: 600.0
+#   then:
+#     - lambda: |-
+#         int poczatek = 0x70;
+#         int koniec = 0x9F;
+#         for (int licznik = poczatek; licznik <= koniec; ++licznik) {
+#            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+#            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");
+#           ESP_LOGD("main", "Licznik: %d", licznik);
+#           delay(1000);  // Opóźnienie o 1 sekundę
+#         }
+
+# globals:
+#   - id: licznik
+#     type: int
+#     initial_value: '0x70'
+#   - id: koniec
+#     type: int
+#     initial_value: '0x9F'
+
+# # Definicja skryptu
+# script:
+#   - id: loop_script
+#     then:
+#       - lambda: |-
+#           if (id(licznik) <= id(koniec)) {
+
+#             ESP_LOGD("main", "Licznik: %d", id(licznik));
+#             id(licznik) += 1;
+#           }
+
+# interval:
+#   - interval: 1s
+#     then:
+#       - if:
+#           condition:
+#             lambda: 'return id(licznik) <= id(koniec);'
+#           then:
+#             - script.execute: loop_script
+
+
+# Ustawienie wartości:
+# globals:
+#   - id: licznik
+#     type: int
+#     initial_value: '0x00'
+#   - id: koniec
+#     type: int
+#     initial_value: '0x71'
+
+# # Definicja skryptu
+# script:
+#   - id: loop_script
+#     then:
+#       - lambda: |-
+#           if (id(licznik) <= id(koniec)) {
+#             char licznik_str[5];
+#             snprintf(licznik_str, sizeof(licznik_str), "%02X", id(licznik));
+#             my_nice_cover->send_inf_cmd("0003", "04", std::string(licznik_str), "a9", "00", true, "01");
+#             my_nice_cover->send_inf_cmd("0003", "04", std::string(licznik_str), "99", "00", true, "01");
+#             ESP_LOGD("main", "Licznik: %s (hex) %d (dec)", licznik_str, id(licznik));
+#             id(licznik) += 1;
+#           }
+
+# interval:
+#   - interval: 1s
+#     then:
+#       - if:
+#           condition:
+#             lambda: 'return id(licznik) <= id(koniec);'
+#           then:
+#             - script.execute: loop_script
+
+# Odczyt statusu
+
+# globals:
+#   - id: licznik
+#     type: int
+#     initial_value: '0x00'
+#   - id: koniec
+#     type: int
+#     initial_value: '0xFF'
+
+# # Definicja skryptu
+# script:
+#   - id: delay_start_script
+#     then:
+#       - delay: 240s  # 4 minuty opóźnienia
+#       - script.execute: loop_script
+
+#   - id: loop_script
+#     then:
+#       - lambda: |-
+#           if (id(licznik) <= id(koniec)) {
+#             char licznik_str[5];
+#             snprintf(licznik_str, sizeof(licznik_str), "%02X", id(licznik));
+#             ESP_LOGD("main", "Licznik: %s (hex), %d (dec)", licznik_str, id(licznik));
+#             my_nice_cover->send_inf_cmd("0003", "04", std::string(licznik_str), "99", "00", true, "01");
+#             id(licznik) += 1;
+#           }
+
+# interval:
+#   - interval: 2s
+#     then:
+#       - if:
+#           condition:
+#             lambda: 'return id(licznik) <= id(koniec);'
+#           then:
+#             - script.execute: loop_script
+
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${device_name_friendly}
+
+# # Dodaj blok on_boot, aby uruchomić skrypt z opóźnieniem
+  # on_boot:
+  #   priority: -10
+  #   then:
+  #     - script.execute: delay_start_script
+
+# ESP_LOGD("main", "Licznik: %d", id(licznik));            
+
+# number:
+#   - platform: template
+#     name: number_test
+#     id: my_input_number
+#     min_value: 1.0
+#     max_value: 6.0
+#     step: 0.05
+#     icon: 'mdi:cog'
+#     restore_value: true
+#     initial_value: 1.0
+#     optimistic: true
+#     mode: 'slider'
+
+# text_sensor:
+#   - platform: template
+#     name: "Template Text Sensor"
+#     lambda: |-
+#       return {my_nice_cover -> NiceBusT4::current_pause_time_level.c_str()};
+#     update_interval: 1s
+
+  # - platform: template
+  #   name: number_test
+  #   id: my_input_number
+  #   icon: 'mdi:cog'
+  #   restore_value: true
+  #   initial_value: 1.0
+  #   optimistic: true
+
+# select:
+#   - platform: template
+#     name: l2L1 - Czas pauzy
+#     id: czas_pauzy_select
+#     optimistic: True
+#     options:
+#       - 'L1 - 5 s'
+#       - 'L2 - 15 s'
+#       - 'L3 - 30 s'
+#       - 'L4 - 45 s'
+#       - 'L5 - 60 s'
+#       - 'L6 - 80 s'
+#       - 'L7 - 120 s'
+#       - 'L8 - 180 s'
+#     initial_option: 'L3 - 30 s'
+#     # lambda: |-
+#     #   if (my_nice_cover -> NiceBusT4::current_pause_time_level) {
+#     #     std::string new_option;
+#     #     switch (current_pause_time_level) {
+#     #       case 1:
+#     #         new_option = "L1 - 5 s";
+#     #         break;
+#     #       case 2:
+#     #         new_option = "L2 - 15 s";
+#     #         break;
+#     #       case 3:
+#     #         new_option = "L3 - 30 s";
+#     #         break;
+#     #       case 4:
+#     #         new_option = "L4 - 45 s";
+#     #         break;
+#     #       case 5:
+#     #         new_option = "L5 - 60 s";
+#     #         break;
+#     #       case 6:
+#     #         new_option = "L6 - 80 s";
+#     #         break;
+#     #       case 7:
+#     #         new_option = "L7 - 120 s";
+#     #         break;
+#     #       case 8:
+#     #         new_option = "L8 - 180 s";
+#     #         break;
+#     #       default:
+#     #         new_option = "L3 - 30 s";  // Default option if the level is out of range
+#     #     }
+#     #     id(czas_pauzy_select).publish_state(new_option.c_str());
+#     #   }
+#     on_value: 
+#       then:
+#         # - logger.log: "wybrano opcję"
+#         - logger.log: 
+#             format: "wybrano opcję %s"
+#             args: [ "x.c_str()" ]
+#         - lambda: |-
+#             std::string czas_pauzy_variable;
+#             if (x == "L1 - 5 s") {
+#               czas_pauzy_variable = "1";
+#             } else if (x == "L2 - 15 s") {
+#               czas_pauzy_variable = "2";
+#             } else if (x == "L3 - 30 s") {
+#               czas_pauzy_variable = "3";
+#             } else if (x == "L4 - 45 s") {
+#               czas_pauzy_variable = "4";
+#             } else if (x == "L5 - 60 s") {
+#               czas_pauzy_variable = "5";
+#             } else if (x == "L6 - 80 s") {
+#               czas_pauzy_variable = "6";
+#             } else if (x == "L7 - 120 s") {
+#               czas_pauzy_variable = "7";
+#             } else if (x == "L8 - 180 s") {
+#               czas_pauzy_variable = "8";
+#             }
+#             my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "81", "a9", "00", true, czas_pauzy_variable.c_str());
+#             my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "81", "99", "00", true, "01");    

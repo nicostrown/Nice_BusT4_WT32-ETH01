@@ -74,31 +74,28 @@ void NiceBusT4::setup() {
 
 void NiceBusT4::loop() {
 
-    if ((millis() - this->last_update_) > 10000) {    // every 10 seconds
-// If the drive is not detected the first time, we will try later
-        std::vector<uint8_t> unknown = {0x55, 0x55};
-        if (this->init_ok == false) {
-          this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-          this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-        }
-        
-        else if (this->class_gate_ == 0x55) {
-		init_device(this->addr_to[0], this->addr_to[1], 0x04);  
-	//        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-	}
-        else if (this->manufacturer_ == unknown)  {
-                init_device(this->addr_to[0], this->addr_to[1], 0x04);  
-        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-        //        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-		
-        }
-        this->last_update_ = millis();
-    }  // if  every minute
+	if ((millis() - this->last_update_) > 10000) {    // every 10 seconds // If the drive is not detected the first time, we will try later
+			std::vector<uint8_t> unknown = {0x55, 0x55};
+			if (this->init_ok == false) {
+				ESP_LOGI(TAG, "  Who is online request");
+				this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+				ESP_LOGI(TAG, "  Product request");
+				this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+			} else if (this->class_gate_ == 0x55) {
+				init_device(this->addr_to[0], this->addr_to[1], 0x04);  
+				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+			} else if (this->manufacturer_ == unknown)  {
+				init_device(this->addr_to[0], this->addr_to[1], 0x04);  
+				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+			}
+			this->last_update_ = millis();
+	}  // if  every minute
 
 	
   // allow sending every 100 ms
-    uint32_t now = millis();
+  uint32_t now = millis();
   if (now - this->last_uart_byte_ > 100) {
     this->ready_to_tx_ = true;
     this->last_uart_byte_ = now;
@@ -367,32 +364,32 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           //      default: // cmd_mnu
         case AUTOCLS:
           this->autocls_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");	
+					ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");	
           break;
           
         case PH_CLS_ON:
           this->photocls_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
           break;  
           
         case ALW_CLS_ON:
           this->alwayscls_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
           break;     
 
-	case STANDBY_ON:
+				case STANDBY_ON:
           this->standby_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");
           break; 
 	      
-	case START_ON:
+				case START_ON:
           this->peak_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
           break; 
 	      
-	case BLINK_ON:
+				case BLINK_ON:
           this->preflashing_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
           break; 
 
    //      case SLAVE_ON:
@@ -402,14 +399,14 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 	      
         case SLAVE_ON:
           this->slavemode_flag = data[14];
-	  ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
+					ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
           break; 
 
-	//level2 settings:
-	// case P_TIME:
- //          this->current_pause_time_level = data[14];
-	//   ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level );
- //          break; 
+	// level2 settings:
+				// case P_TIME:
+					// this->pause_time_level = data[14];
+					// ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level );
+					// break; 
 	      
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
@@ -437,29 +434,30 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
 
-	case STANDBY_ON:
+				case STANDBY_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, STANDBY_ON, GET)); // Pre-flasing
           break;
 	      
-	case START_ON:
+				case START_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // Pre-flasing
           break;
 	      
-	case BLINK_ON:
+				case BLINK_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
           break;   
 
-	// case BLINK_ON:
- //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
- //          break;
+				// case BLINK_ON:
+			 //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
+			 //          break;
 
-	case SLAVE_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
-          break;
+				case SLAVE_ON:
+					tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
+					break;
 
-	// case P_TIME:
- //          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // Pre-flasing
- //          break;	      
+				//level 2 settings
+				// case P_TIME:
+			 //  	tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
+			 //   break;	      
 	      
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
@@ -489,7 +487,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
               this->is_robus = true;
           //    ESP_LOGCONFIG(TAG, "  Drive unit ROBUS!: %S ", str.c_str());
                                         }		  
-		  
+
           }
           break;
         case HWR:
@@ -891,8 +889,8 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
-  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level);
-	
+  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level);
+
 }
 
 
@@ -1060,6 +1058,7 @@ void NiceBusT4::set_mcu(std::string command, std::string data_command) {
 // device initialization
 void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device ) {
   if (device == FOR_CU) {
+		ESP_LOGI(TAG, "Checkinf motor settings");
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, TYPE_M, GET, 0x00)); // drive type request
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, MAN, GET, 0x00)); // manufacturer's request
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, FRM, GET, 0x00)); //  firmware request

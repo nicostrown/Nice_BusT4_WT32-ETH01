@@ -406,10 +406,10 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           break; 
 
 	//level2 settings:
-	case P_TIME:
-          this->current_pause_time_level = data[14];
-	  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level );
-          break; 
+	// case P_TIME:
+ //          this->current_pause_time_level = data[14];
+	//   ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level );
+ //          break; 
 	      
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
@@ -457,9 +457,9 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
           break;
 
-	case P_TIME:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // Pre-flasing
-          break;	      
+	// case P_TIME:
+ //          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // Pre-flasing
+ //          break;	      
 	      
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
@@ -891,7 +891,7 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
-  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level);
+  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", current_pause_time_level);
 	
 }
 
@@ -1084,7 +1084,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SLAVE_ON, GET, 0x00)); // Slave mode
 
     //level 2 settings  
-    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Slave mode	  
+    // tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time  
 	  
   }
   if (device == FOR_OXI) {

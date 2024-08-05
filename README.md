@@ -1,4 +1,11 @@
 # ESPHOME component to control Nice drives via Bus T4 protocol ESP32 board based
+
+Based on https://github.com/pruwait/Nice_BusT4.
+Modyfication:
+- change ESP8266 uart address and functions to appropriate for ESP32.
+- addedd all known level 1 settings to yaml (without “Close” becomes “Partial open” - unknown address)
+Checked with ROBUS400 with RB400SR10 driver 
+
 # Nice Bus T4 protocol
 
 Allowes WT32-ETH01 to communicate with Nice gate/garage openers using the Bus T4 port.

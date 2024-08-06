@@ -82,6 +82,7 @@ void NiceBusT4::loop() {
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
         ESP_LOGI(TAG, "  Product request");
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+        ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %S ", pause_time_level);
       } else if (this->class_gate_ == 0x55) {
         ESP_LOGI(TAG, "  Initialize device - class_gate == 0x55");
         init_device(this->addr_to[0], this->addr_to[1], 0x04);  
@@ -892,7 +893,7 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
-  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level);
+  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %d ", pause_time_level);
 
 }
 

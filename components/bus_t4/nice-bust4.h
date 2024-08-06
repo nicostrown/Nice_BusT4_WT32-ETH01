@@ -78,30 +78,30 @@ static const float CLOSED_POSITION_THRESHOLD = 0.007;  // The percentage value o
 static const uint32_t POSITION_UPDATE_INTERVAL = 500;  // Update interval of the current drive position, ms
 
 /* esp network settings
-          The series can take values from 0 to 63, by default 0
-          OVIEW address starts with 8
+The series can take values from 0 to 63, by default 0
+OVIEW address starts with 8
 
-          When networking several drives with OXI, different rows must be specified for different drives.
-          In this case, the OXI must have the same row as the drive it controls.
-        */
+When networking several drives with OXI, different rows must be specified for different drives.
+In this case, the OXI must have the same row as the drive it controls.
+*/
 
-        /* Packet message type
-          so far we are only interested in CMD and INF
-          for the rest, I did not check the numbers
-          6th byte of CMD and INF packets
-        */
+/* Packet message type
+so far we are only interested in CMD and INF
+for the rest, I did not check the numbers
+6th byte of CMD and INF packets
+*/
 enum mes_type : uint8_t {
-            CMD = 0x01,  /* number verified, sending commands to automation */
-            //  LSC = 0x02,  /* working with script lists */
-            //  LST = 0x03,  /* work with automatic lists */
-            //  POS = 0x04,  /* request and change the position of automation */
-            //  GRP = 0x05,  /* sending commands to a group of automations indicating the bit mask of the motor */
-            //  SCN = 0x06,  /* working with scripts */
-            //  GRC = 0x07,  /* sending commands to a group of automations created through Nice Screen Configuration Tool */
-            INF = 0x08,  /* returns or sets device information */
-            //  LGR = 0x09,  /* working with group lists */
-            //  CGR = 0x0A,  /* work with categories of groups created through Nice Screen Configuration Tool */
-        };
+  CMD = 0x01,  /* number verified, sending commands to automation */
+  //  LSC = 0x02,  /* working with script lists */
+  //  LST = 0x03,  /* work with automatic lists */
+  //  POS = 0x04,  /* request and change the position of automation */
+  //  GRP = 0x05,  /* sending commands to a group of automations indicating the bit mask of the motor */
+  //  SCN = 0x06,  /* working with scripts */
+  //  GRC = 0x07,  /* sending commands to a group of automations created through Nice Screen Configuration Tool */
+  INF = 0x08,  /* returns or sets device information */
+  //  LGR = 0x09,  /* working with group lists */
+  //  CGR = 0x0A,  /* work with categories of groups created through Nice Screen Configuration Tool */
+};
 
 
 
@@ -134,96 +134,96 @@ enum errors_byte  : uint8_t {
 
 // Motor types
 enum motor_type  : uint8_t {
-  SLIDING = 0x01, 
+  SLIDING   = 0x01, 
   SECTIONAL = 0x02,
-  SWING = 0x03,
-  BARRIER = 0x04,
+  SWING     = 0x03,
+  BARRIER   = 0x04,
   UPANDOVER = 0x05, // up-and-over подъемно-поворотные ворота
   };
 
 //  9th byte
 enum whose_pkt  : uint8_t {
   FOR_ALL = 0x00,  /* package for/from everyone */
-  FOR_CU = 0x04,  /* package to/from control unit */
+  FOR_CU  = 0x04,  /* package to/from control unit */
   FOR_OXI = 0x0A,  /* package to/from OXI receiver */
   };
   
 // 10th byte of GET/SET of EVT packets, only RUN was encountered for CMD packets
 enum setup_submnu : uint8_t {
-  TYPE_M =    0x00, // Actuator type query
-  INF_STATUS =  0x01, // Gate status (Opened/Closed/Stopped)
-  WHO =       0x04, // Who is online?
+  TYPE_M         = 0x00, // Actuator type query
+  INF_STATUS     = 0x01, // Gate status (Opened/Closed/Stopped)
+  WHO            = 0x04, // Who is online?
   
-  MAC =         0x07, // Mac address
-  MAN =         0x08, // Manufacturer
-  PRD =         0x09, // Product
-  INF_SUPPORT = 0x10, // Available INF commands
-  HWR =         0x0a, // Hardware version
-  FRM =         0x0b, // Firmware version
-  DSC =         0x0c, // Description
-  CUR_POS =     0x11, // Current position of automation (DPRO924 then waits for positions to be set)
-  MAX_OPN =     0x12, // The maximum possible opening according to the encoder.
-  POS_MAX =     0x18, // Maximum position (opening) by encoder
-  POS_MIN =     0x19, // Minimum position (closing) by encoder
-  INF_P_OPN1 =  0x21, // Partial opening1
-  INF_P_OPN2 =  0x22, // Partial opening2
-  INF_P_OPN3 =  0x23, // Partial opening3
-  INF_SLOW_OPN = 0x24, // Slowdown delay in opening
-  INF_SLOW_CLS = 0x25, // Slowdown delay in closing
+  MAC            = 0x07, // Mac address
+  MAN            = 0x08, // Manufacturer
+  PRD            = 0x09, // Product
+  INF_SUPPORT    = 0x10, // Available INF commands
+  HWR            = 0x0a, // Hardware version
+  FRM            = 0x0b, // Firmware version
+  DSC            = 0x0c, // Description
+  CUR_POS        = 0x11, // Current position of automation (DPRO924 then waits for positions to be set)
+  MAX_OPN        = 0x12, // The maximum possible opening according to the encoder.
+  POS_MAX        = 0x18, // Maximum position (opening) by encoder
+  POS_MIN        = 0x19, // Minimum position (closing) by encoder
+  INF_P_OPN1     = 0x21, // Partial opening1
+  INF_P_OPN2     = 0x22, // Partial opening2
+  INF_P_OPN3     = 0x23, // Partial opening3
+  INF_SLOW_OPN   = 0x24, // Slowdown delay in opening
+  INF_SLOW_CLS   = 0x25, // Slowdown delay in closing
   
-  OPN_OFFSET   = 0x28, /* Opening delay open offset */
-  CLS_OFFSET   = 0x29, /* Delayed closing  close offset */
-  OPN_DIS      = 0x2A, /* Main parameters - Opening unloading Open discharge */
-  CLS_DIS      = 0x2B, /* Основные параметры - Разгрузка закрытия Close discharge */
-  REV_TIME     = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
-  OPN_PWR =     0x4A, // Basic parameters - Force control - Opening force
-  CLS_PWR =     0x4B, // Basic parameters - Force control - Closing force
-  SPEED_OPN =   0x42, // Basic parameters - Speed setting - Opening speed
-  SPEED_CLS =   0x43, // Basic parameters - Speed setting - Closing speed
-  SPEED_SLW_OPN = 0x45, // Basic parameters - Speed setting - Slow opening speed
-  SPEED_SLW_CLS = 0x46, // Basic parameters - Speed setting - Slow closing speed  
-  OUT1 =        0x51, // Output settings
-  OUT2 =        0x52, // Output settings
-  LOCK_TIME =   0x5A, // Output settings - Lock operation time
-  LAMP_TIME =   0x5B, // Output settings - courtesy light time
-  S_CUP_TIME =  0x5C, // Output Setting - Suction Cup Time
+  OPN_OFFSET     = 0x28, /* Opening delay open offset */
+  CLS_OFFSET     = 0x29, /* Delayed closing close offset */
+  OPN_DIS        = 0x2A, /* Main parameters - Opening unloading Open discharge */
+  CLS_DIS        = 0x2B, /* Основные параметры - Разгрузка закрытия Close discharge */
+  REV_TIME       = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
+  OPN_PWR        = 0x4A, // Basic parameters - Force control - Opening force
+  CLS_PWR        = 0x4B, // Basic parameters - Force control - Closing force
+  SPEED_OPN      = 0x42, // Basic parameters - Speed setting - Opening speed
+  SPEED_CLS      = 0x43, // Basic parameters - Speed setting - Closing speed
+  SPEED_SLW_OPN  = 0x45, // Basic parameters - Speed setting - Slow opening speed
+  SPEED_SLW_CLS  = 0x46, // Basic parameters - Speed setting - Slow closing speed 
+  OUT1           = 0x51, // Output settings
+  OUT2           = 0x52, // Output settings
+  LOCK_TIME      = 0x5A, // Output settings - Lock operation time
+  LAMP_TIME      = 0x5B, // Output settings - courtesy light time
+  S_CUP_TIME     = 0x5C, // Output Setting - Suction Cup Time
   
-  COMM_SBS =    0x61, // Setting up commands - Step by step
-  COMM_POPN =   0x62, // Command Settings - Open Partially
-  COMM_OPN =    0x63, // Command settings - Open
-  COMM_CLS =    0x64, // Command Settings - Close
-  COMM_STP =    0x65, // Command setting - STOP
-  COMM_PHOTO =  0x68, // Command setup - Photo
-  COMM_PHOTO2 =   0x69, // Command settings - Photo2
-  COMM_PHOTO3 =   0x6A, // Command settings - Photo3
-  COMM_OPN_STP =  0x6B, // Command setting - Stop on opening
-  COMM_CLS_STP =  0x6C, // Command settings - Stop on close
+  COMM_SBS       = 0x61, // Setting up commands - Step by step
+  COMM_POPN      = 0x62, // Command Settings - Open Partially
+  COMM_OPN       = 0x63, // Command settings - Open
+  COMM_CLS       = 0x64, // Command Settings - Close
+  COMM_STP       = 0x65, // Command setting - STOP
+  COMM_PHOTO     = 0x68, // Command setup - Photo
+  COMM_PHOTO2    = 0x69, // Command settings - Photo2
+  COMM_PHOTO3    = 0x6A, // Command settings - Photo3
+  COMM_OPN_STP   = 0x6B, // Command setting - Stop on opening
+  COMM_CLS_STP   = 0x6C, // Command settings - Stop on close
   
-  IN1 =       0x71, // Input setup
-  IN2 =       0x72, // Input setup
-  IN3 =       0x73, // Input setup
-  IN4 =       0x74, // Input setup
+  IN1            = 0x71, // Input setup
+  IN2            = 0x72, // Input setup
+  IN3            = 0x73, // Input setup
+  IN4            = 0x74, // Input setup
   
-  COMM_LET_OPN =  0x78, // Command settings - Interference with opening
-  COMM_LET_CLS =  0x79, // Command settings - Interference with closing
+  COMM_LET_OPN   = 0x78, // Command settings - Interference with opening
+  COMM_LET_CLS   = 0x79, // Command settings - Interference with closing
   
-  AUTOCLS =     0x80, // Basic Settings - Auto Close
-  P_TIME =      0x81, // Main parameters - Pause time
-  PH_CLS_ON =   0x84, // Main Options - Close after Photo - Active
-  PH_CLS_TIME = 0x85, // Basic options - Close after Photo - Waiting time
-  PH_CLS_VAR =  0x86, // Main Options - Close after Photo - Mode
-  ALW_CLS_ON =  0x88, // Basic options - Always close - Active
-  ALW_CLS_TIME = 0x89, // Basic options - Always close - Timeout
-  ALW_CLS_VAR = 0x8A, // Basic options - Always close - Mode
-  STANDBY_ON =  0x8C, // Stand-by Active
-  WAIT_TIME   = 0x8d, /* Main parameters - Standby mode - Standby time */
-  STAND_BY_MODE = 0x8e, /* Main settings - Standby mode - Mode -  safety = 0x00, bluebus=0x01, all=0x02 */
+  AUTOCLS        = 0x80, // Basic Settings - Auto Close
+  P_TIME         = 0x81, // Main parameters - Pause time
+  PH_CLS_ON      = 0x84, // Main Options - Close after Photo - Active
+  PH_CLS_TIME    = 0x85, // Basic options - Close after Photo - Waiting time
+  PH_CLS_VAR     = 0x86, // Main Options - Close after Photo - Mode
+  ALW_CLS_ON     = 0x88, // Basic options - Always close - Active
+  ALW_CLS_TIME   = 0x89, // Basic options - Always close - Timeout
+  ALW_CLS_VAR    = 0x8A, // Basic options - Always close - Mode
+  STANDBY_ON     = 0x8C, // Stand-by Active
+  WAIT_TIME      = 0x8d, /* Main parameters - Standby mode - Standby time */
+  STAND_BY_MODE  = 0x8e, /* Main settings - Standby mode - Mode - safety = 0x00, bluebus=0x01, all=0x02 */
   
-  START_ON =    0x90, // Basic parameters - Start setting - Active
-  START_TIME =  0x91, // Basic parameters - Start setting - Start time
-  BLINK_ON =    0x94, // Basic parameters - Blink - Active
+  START_ON       = 0x90, // Basic parameters - Start setting - Active
+  START_TIME     = 0x91, // Basic parameters - Start setting - Start time
+  BLINK_ON       = 0x94, // Basic parameters - Blink - Active
   BLINK_OPN_TIME = 0x95, // Basic parameters - Blink - Opening time
-  SLAVE_ON =    0x98, // Slave mode Active
+  SLAVE_ON       = 0x98, // Slave mode Active
   BLINK_CLS_TIME = 0x99, // Basic parameters - Flicker - Time on closing
   OP_BLOCK       = 0x9A, /* Main parameters - Motor blocking (Operator block)*/
   KEY_LOCK       = 0x9C, /* Basic settings - Button locking */
@@ -231,22 +231,22 @@ enum setup_submnu : uint8_t {
   DIS_VAL        = 0xA4, /* Position - Value is not allowed - disable value */
   P_COUNT        = 0xB2, /* Partial count - Dedicated counter*/
   C_MAIN         = 0xB4, /* Cancel maintenance Отмена обслуживания */
-  DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */  
+  DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */ 
   INF_IO         = 0xD1, /* Input-output status */
-  DIAG_PAR       = 0xD2, /*  DIAGNOSTICS of other parameters   */
-
-  CUR_MAN = 0x02, // Current Maneuver
-  SUBMNU = 0x04, // Submenu
-  STA = 0xC0, // Status in motion
-  MAIN_SET = 0x80, // Main settings
-  RUN = 0x82, // Command to execute
+  DIAG_PAR       = 0xD2, /* DIAGNOSTICS of other parameters */
+  
+  CUR_MAN        = 0x02, // Current Maneuver
+  SUBMNU         = 0x04, // Submenu
+  STA            = 0xC0, // Status in motion
+  MAIN_SET       = 0x80, // Main settings
+  RUN            = 0x82, // Command to execute
 };
 
   
 /* run cmd byte 11 of EVT packets */
 enum run_cmd : uint8_t {
-  SET = 0xA9, // parameter change request
-  GET = 0x99, // request to get parameters
+  SET          = 0xA9, // parameter change request
+  GET          = 0x99, // request to get parameters
   GET_SUPP_CMD = 0x89, // get supported commands
 };
 

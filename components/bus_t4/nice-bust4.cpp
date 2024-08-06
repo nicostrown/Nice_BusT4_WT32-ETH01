@@ -76,6 +76,7 @@ void NiceBusT4::loop() {
 
 	if ((millis() - this->last_update_) > 10000) {    // every 10 seconds // If the drive is not detected the first time, we will try later
 			std::vector<uint8_t> unknown = {0x55, 0x55};
+      ESP_LOGI(TAG, "  Initialize device");
 			if (this->init_ok == false) {
 				ESP_LOGI(TAG, "  Who is online request");
 				this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));

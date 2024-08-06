@@ -147,144 +147,144 @@ enum whose_pkt  : uint8_t {
   FOR_CU = 0x04,  /* package to/from control unit */
   FOR_OXI = 0x0A,  /* package to/from OXI receiver */
   };
-	
+  
 // 10th byte of GET/SET of EVT packets, only RUN was encountered for CMD packets
 enum setup_submnu : uint8_t {
-	TYPE_M = 		0x00, // Actuator type query
-	INF_STATUS = 	0x01, // Gate status (Opened/Closed/Stopped)
-	WHO = 			0x04, // Who is online?
-	
-	MAC = 			0x07, // Mac address
-	MAN = 			0x08, // Manufacturer
-	PRD = 			0x09, // Product
-	INF_SUPPORT = 	0x10, // Available INF commands
-	HWR = 			0x0a, // Hardware version
-	FRM = 			0x0b, // Firmware version
-	DSC = 			0x0c, // Description
-	CUR_POS = 		0x11, // Current position of automation (DPRO924 then waits for positions to be set)
-	MAX_OPN = 		0x12, // The maximum possible opening according to the encoder.
-	POS_MAX = 		0x18, // Maximum position (opening) by encoder
-	POS_MIN = 		0x19, // Minimum position (closing) by encoder
-	INF_P_OPN1 = 	0x21, // Partial opening1
-	INF_P_OPN2 = 	0x22, // Partial opening2
-	INF_P_OPN3 = 	0x23, // Partial opening3
-	INF_SLOW_OPN  = 0x24, // Slowdown delay in opening
-	INF_SLOW_CLS  =	0x25, // Slowdown delay in closing
-	
-	OPN_OFFSET    = 0x28, /* Opening delay open offset */
-	CLS_OFFSET    = 0x29, /* Delayed closing  close offset */
-	OPN_DIS       = 0x2A, /* Main parameters - Opening unloading Open discharge */
-	CLS_DIS       = 0x2B, /* Основные параметры - Разгрузка закрытия Close discharge */
-	REV_TIME      = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
-	OPN_PWR = 		0x4A, // Basic parameters - Force control - Opening force
-	CLS_PWR = 		0x4B, // Basic parameters - Force control - Closing force
-	SPEED_OPN = 	0x42, // Basic parameters - Speed setting - Opening speed
-	SPEED_CLS = 	0x43, // Basic parameters - Speed setting - Closing speed
-	SPEED_SLW_OPN = 0x45, // Basic parameters - Speed setting - Slow opening speed
-	SPEED_SLW_CLS = 0x46, // Basic parameters - Speed setting - Slow closing speed	
-	OUT1 = 			0x51, // Output settings
-	OUT2 = 			0x52, // Output settings
-	LOCK_TIME = 	0x5A, // Output settings - Lock operation time
-	LAMP_TIME = 	0x5B, // Output settings - courtesy light time
-	S_CUP_TIME = 	0x5C, // Output Setting - Suction Cup Time
-	
-	COMM_SBS = 		0x61, // Setting up commands - Step by step
-	COMM_POPN =	 	0x62, // Command Settings - Open Partially
-	COMM_OPN = 		0x63, // Command settings - Open
-	COMM_CLS = 		0x64, // Command Settings - Close
-	COMM_STP = 		0x65, // Command setting - STOP
-	COMM_PHOTO = 	0x68, // Command setup - Photo
-	COMM_PHOTO2 = 	0x69, // Command settings - Photo2
-	COMM_PHOTO3 = 	0x6A, // Command settings - Photo3
-	COMM_OPN_STP = 	0x6B, // Command setting - Stop on opening
-	COMM_CLS_STP = 	0x6C, // Command settings - Stop on close
-	
-	IN1 = 			0x71, // Input setup
-	IN2 = 			0x72, // Input setup
-	IN3 = 			0x73, // Input setup
-	IN4 = 			0x74, // Input setup
-	
-	COMM_LET_OPN = 	0x78, // Command settings - Interference with opening
-	COMM_LET_CLS = 	0x79, // Command settings - Interference with closing
-	
-	AUTOCLS = 		0x80, // Basic Settings - Auto Close
-	P_TIME = 		0x81, // Main parameters - Pause time
-	PH_CLS_ON = 	0x84, // Main Options - Close after Photo - Active
-	PH_CLS_TIME = 	0x85, // Basic options - Close after Photo - Waiting time
-	PH_CLS_VAR = 	0x86, // Main Options - Close after Photo - Mode
-	ALW_CLS_ON = 	0x88, // Basic options - Always close - Active
-	ALW_CLS_TIME = 	0x89, // Basic options - Always close - Timeout
-	ALW_CLS_VAR = 	0x8A, // Basic options - Always close - Mode
-	STANDBY_ON = 	0x8C, // Stand-by Active
-	WAIT_TIME     = 0x8d, /* Main parameters - Standby mode - Standby time */
-	STAND_BY_MODE = 0x8e, /* Main settings - Standby mode - Mode -  safety = 0x00, bluebus=0x01, all=0x02 */
-	
-	START_ON = 		0x90, // Basic parameters - Start setting - Active
-	START_TIME = 	0x91, // Basic parameters - Start setting - Start time
-	BLINK_ON = 		0x94, // Basic parameters - Blink - Active
-	BLINK_OPN_TIME = 0x95, // Basic parameters - Blink - Opening time
-	SLAVE_ON = 		0x98, // Slave mode Active
-	BLINK_CLS_TIME = 0x99, // Basic parameters - Flicker - Time on closing
-	OP_BLOCK       = 0x9A, /* Main parameters - Motor blocking (Operator block)*/
-	KEY_LOCK       = 0x9C, /* Basic settings - Button locking */
-	SLOW_ON 	   = 0xA2, // Main parameters - Slowdown
-	DIS_VAL        = 0xA4, /* Position - Value is not allowed - disable value */
-	P_COUNT        = 0xB2, /* Partial count - Dedicated counter*/
-	C_MAIN         = 0xB4, /* Cancel maintenance Отмена обслуживания */
-	DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */  
-	INF_IO         = 0xD1, /* Input-output status	*/
-	DIAG_PAR       = 0xD2, /*  DIAGNOSTICS of other parameters   */
+  TYPE_M =    0x00, // Actuator type query
+  INF_STATUS =  0x01, // Gate status (Opened/Closed/Stopped)
+  WHO =       0x04, // Who is online?
+  
+  MAC =         0x07, // Mac address
+  MAN =         0x08, // Manufacturer
+  PRD =         0x09, // Product
+  INF_SUPPORT = 0x10, // Available INF commands
+  HWR =         0x0a, // Hardware version
+  FRM =         0x0b, // Firmware version
+  DSC =         0x0c, // Description
+  CUR_POS =     0x11, // Current position of automation (DPRO924 then waits for positions to be set)
+  MAX_OPN =     0x12, // The maximum possible opening according to the encoder.
+  POS_MAX =     0x18, // Maximum position (opening) by encoder
+  POS_MIN =     0x19, // Minimum position (closing) by encoder
+  INF_P_OPN1 =  0x21, // Partial opening1
+  INF_P_OPN2 =  0x22, // Partial opening2
+  INF_P_OPN3 =  0x23, // Partial opening3
+  INF_SLOW_OPN = 0x24, // Slowdown delay in opening
+  INF_SLOW_CLS = 0x25, // Slowdown delay in closing
+  
+  OPN_OFFSET   = 0x28, /* Opening delay open offset */
+  CLS_OFFSET   = 0x29, /* Delayed closing  close offset */
+  OPN_DIS      = 0x2A, /* Main parameters - Opening unloading Open discharge */
+  CLS_DIS      = 0x2B, /* Основные параметры - Разгрузка закрытия Close discharge */
+  REV_TIME     = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
+  OPN_PWR =     0x4A, // Basic parameters - Force control - Opening force
+  CLS_PWR =     0x4B, // Basic parameters - Force control - Closing force
+  SPEED_OPN =   0x42, // Basic parameters - Speed setting - Opening speed
+  SPEED_CLS =   0x43, // Basic parameters - Speed setting - Closing speed
+  SPEED_SLW_OPN = 0x45, // Basic parameters - Speed setting - Slow opening speed
+  SPEED_SLW_CLS = 0x46, // Basic parameters - Speed setting - Slow closing speed  
+  OUT1 =        0x51, // Output settings
+  OUT2 =        0x52, // Output settings
+  LOCK_TIME =   0x5A, // Output settings - Lock operation time
+  LAMP_TIME =   0x5B, // Output settings - courtesy light time
+  S_CUP_TIME =  0x5C, // Output Setting - Suction Cup Time
+  
+  COMM_SBS =    0x61, // Setting up commands - Step by step
+  COMM_POPN =   0x62, // Command Settings - Open Partially
+  COMM_OPN =    0x63, // Command settings - Open
+  COMM_CLS =    0x64, // Command Settings - Close
+  COMM_STP =    0x65, // Command setting - STOP
+  COMM_PHOTO =  0x68, // Command setup - Photo
+  COMM_PHOTO2 =   0x69, // Command settings - Photo2
+  COMM_PHOTO3 =   0x6A, // Command settings - Photo3
+  COMM_OPN_STP =  0x6B, // Command setting - Stop on opening
+  COMM_CLS_STP =  0x6C, // Command settings - Stop on close
+  
+  IN1 =       0x71, // Input setup
+  IN2 =       0x72, // Input setup
+  IN3 =       0x73, // Input setup
+  IN4 =       0x74, // Input setup
+  
+  COMM_LET_OPN =  0x78, // Command settings - Interference with opening
+  COMM_LET_CLS =  0x79, // Command settings - Interference with closing
+  
+  AUTOCLS =     0x80, // Basic Settings - Auto Close
+  P_TIME =      0x81, // Main parameters - Pause time
+  PH_CLS_ON =   0x84, // Main Options - Close after Photo - Active
+  PH_CLS_TIME = 0x85, // Basic options - Close after Photo - Waiting time
+  PH_CLS_VAR =  0x86, // Main Options - Close after Photo - Mode
+  ALW_CLS_ON =  0x88, // Basic options - Always close - Active
+  ALW_CLS_TIME = 0x89, // Basic options - Always close - Timeout
+  ALW_CLS_VAR = 0x8A, // Basic options - Always close - Mode
+  STANDBY_ON =  0x8C, // Stand-by Active
+  WAIT_TIME   = 0x8d, /* Main parameters - Standby mode - Standby time */
+  STAND_BY_MODE = 0x8e, /* Main settings - Standby mode - Mode -  safety = 0x00, bluebus=0x01, all=0x02 */
+  
+  START_ON =    0x90, // Basic parameters - Start setting - Active
+  START_TIME =  0x91, // Basic parameters - Start setting - Start time
+  BLINK_ON =    0x94, // Basic parameters - Blink - Active
+  BLINK_OPN_TIME = 0x95, // Basic parameters - Blink - Opening time
+  SLAVE_ON =    0x98, // Slave mode Active
+  BLINK_CLS_TIME = 0x99, // Basic parameters - Flicker - Time on closing
+  OP_BLOCK       = 0x9A, /* Main parameters - Motor blocking (Operator block)*/
+  KEY_LOCK       = 0x9C, /* Basic settings - Button locking */
+  SLOW_ON        = 0xA2, // Main parameters - Slowdown
+  DIS_VAL        = 0xA4, /* Position - Value is not allowed - disable value */
+  P_COUNT        = 0xB2, /* Partial count - Dedicated counter*/
+  C_MAIN         = 0xB4, /* Cancel maintenance Отмена обслуживания */
+  DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */  
+  INF_IO         = 0xD1, /* Input-output status */
+  DIAG_PAR       = 0xD2, /*  DIAGNOSTICS of other parameters   */
 
-	CUR_MAN = 0x02, // Current Maneuver
-	SUBMNU = 0x04, // Submenu
-	STA = 0xC0, // Status in motion
-	MAIN_SET = 0x80, // Main settings
-	RUN = 0x82, // Command to execute
+  CUR_MAN = 0x02, // Current Maneuver
+  SUBMNU = 0x04, // Submenu
+  STA = 0xC0, // Status in motion
+  MAIN_SET = 0x80, // Main settings
+  RUN = 0x82, // Command to execute
 };
 
-	
+  
 /* run cmd byte 11 of EVT packets */
 enum run_cmd : uint8_t {
-	SET = 0xA9, // parameter change request
-	GET = 0x99, // request to get parameters
-	GET_SUPP_CMD = 0x89, // get supported commands
+  SET = 0xA9, // parameter change request
+  GET = 0x99, // request to get parameters
+  GET_SUPP_CMD = 0x89, // get supported commands
 };
 
 /* The command to be executed.
 11th byte of the CMD packet
 Used in requests and responses */
 enum control_cmd : uint8_t {
-	SBS = 0x01, // Step by Step
-	STOP = 0x02,   /* Stop */
-	OPEN = 0x03,   /* Open */
-	CLOSE = 0x04,  /* Close */
-	P_OPN1 = 0x05, /* Partial opening 1 */
-	P_OPN2 = 0x06, /* Partial opening 2 */
-	P_OPN3 = 0x07, /* Partial opening 3 */
-	RSP = 0x19, /* interface response acknowledging receipt of the command  */
-	EVT = 0x29, /* interface response sending the requested information */
+  SBS = 0x01, // Step by Step
+  STOP = 0x02,   /* Stop */
+  OPEN = 0x03,   /* Open */
+  CLOSE = 0x04,  /* Close */
+  P_OPN1 = 0x05, /* Partial opening 1 */
+  P_OPN2 = 0x06, /* Partial opening 2 */
+  P_OPN3 = 0x07, /* Partial opening 3 */
+  RSP = 0x19, /* interface response acknowledging receipt of the command  */
+  EVT = 0x29, /* interface response sending the requested information */
 
-	P_OPN4 = 0x0b, /* Partial opening 4 - shared */
-	P_OPN5 = 0x0c, /* Partial opening 5 - Priority step by step */
-	P_OPN6 = 0x0d, /* Partial opening 6 - Open and block */
-	UNLK_OPN = 0x19, /* Unlock and open */
-	CLS_LOCK = 0x0E, /* Close and block */
-	UNLCK_CLS = 0x1A, /*  Unlock and close */
-	LOCK = 0x0F, /* Lock */
-	UNLOCK = 0x10, /* Unlock */
-	LIGHT_TIMER = 0x11, /* Light timer */
-	LIGHT_SW = 0x12, /* Light on/off */
-	HOST_SBS = 0x13, /* Host SBS */
-	HOST_OPN = 0x14, /* Lead open */
-	HOST_CLS = 0x15, /* Lead close */
-	SLAVE_SBS = 0x16, /* Slave SBS */
-	SLAVE_OPN = 0x17, /* Slave open */
-	SLAVE_CLS = 0x18, /* Slave close */
-	AUTO_ON = 0x1B, /* Auto open active */
-	AUTO_OFF = 0x1C, /* Auto open inactive */
+  P_OPN4 = 0x0b, /* Partial opening 4 - shared */
+  P_OPN5 = 0x0c, /* Partial opening 5 - Priority step by step */
+  P_OPN6 = 0x0d, /* Partial opening 6 - Open and block */
+  UNLK_OPN = 0x19, /* Unlock and open */
+  CLS_LOCK = 0x0E, /* Close and block */
+  UNLCK_CLS = 0x1A, /*  Unlock and close */
+  LOCK = 0x0F, /* Lock */
+  UNLOCK = 0x10, /* Unlock */
+  LIGHT_TIMER = 0x11, /* Light timer */
+  LIGHT_SW = 0x12, /* Light on/off */
+  HOST_SBS = 0x13, /* Host SBS */
+  HOST_OPN = 0x14, /* Lead open */
+  HOST_CLS = 0x15, /* Lead close */
+  SLAVE_SBS = 0x16, /* Slave SBS */
+  SLAVE_OPN = 0x17, /* Slave open */
+  SLAVE_CLS = 0x18, /* Slave close */
+  AUTO_ON = 0x1B, /* Auto open active */
+  AUTO_OFF = 0x1C, /* Auto open inactive */
 };
 
-	
+  
 /* Information for a better understanding of the composition of packets in the protocol */
 
 // CMD request packet body
@@ -331,7 +331,7 @@ struct packet_rsp_body_t {
   uint8_t pct_size2; // packet body size (without header and CRC. Total number of bytes minus three), >= 0x0e
 
 };
-	
+  
  // response packet body with EVT data
  
  struct packet_evt_body_t {
@@ -365,7 +365,7 @@ enum position_hook_type : uint8_t {
 // I create a class, inherit members of the Component and Cover classes
 class NiceBusT4 : public Component, public Cover {
   public:
-	
+  
     //  drive settings
     bool autocls_flag; // Auto close - L1
     bool photocls_flag; // Close after photo - L2
@@ -382,16 +382,16 @@ class NiceBusT4 : public Component, public Cover {
     bool init_ok = false; //  drive detection when turned on
     bool is_walky = false; // the position request command is different for walky
     bool is_robus = false; // for Robus there is no need to periodically request a position
-		
+    
     void setup() override;
     void loop() override;
     void dump_config() override; // to log information about equipment
 
     void send_raw_cmd(std::string data);
-    void send_cmd(uint8_t data) {this->tx_buffer_.push(gen_control_cmd(data));}	
+    void send_cmd(uint8_t data) {this->tx_buffer_.push(gen_control_cmd(data));} 
     void send_inf_cmd(std::string to_addr, std::string whose, std::string command, std::string type_command,  std::string next_data, bool data_on, std::string data_command); // long command
     void set_mcu(std::string command, std::string data_command); // command to motor controller
-    // void check_cmd();	
+    // void check_cmd();  
 
     void set_class_gate(uint8_t class_gate) { class_gate_ = class_gate; }
     
@@ -422,11 +422,11 @@ class NiceBusT4 : public Component, public Cover {
 
     uint8_t class_gate_ = 0x55; // 0x01 sliding, 0x02 sectional, 0x03 swing, 0x04 barrier, 0x05 up-and-over
 //    uint8_t last_init_command_;
-	
-    bool init_cu_flag = false;	
-    bool init_oxi_flag = false;	
+  
+    bool init_cu_flag = false;  
+    bool init_oxi_flag = false; 
 
-	
+  
     // uart variables
     uint8_t _uart_nr;
     uart_t* _uart = nullptr;
@@ -436,24 +436,24 @@ class NiceBusT4 : public Component, public Cover {
     uint16_t _pos_usl = 0;  // conditional current position of encoder or timer, not for all drives
     // packet header settings
     uint8_t addr_from[2] = {0x00, 0x66}; // from whom is the package, bust4 gateway address
-    uint8_t addr_to[2]; // = 0x00ff;	 // to whom is the package, the address of the drive controller we are controlling
-    uint8_t addr_oxi[2]; // = 0x000a;	 // receiver address
+    uint8_t addr_to[2]; // = 0x00ff;   // to whom is the package, the address of the drive controller we are controlling
+    uint8_t addr_oxi[2]; // = 0x000a;  // receiver address
 
     std::vector<uint8_t> raw_cmd_prepare (std::string data);             // preparing user-entered data for sending
 
     // генерация inf команд
-    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);	 // all fields
+    std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, const std::vector<uint8_t> &data, size_t len);  // all fields
     std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd) {return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, 0x00, {0x00}, 0 );} // for commands without data
     std::vector<uint8_t> gen_inf_cmd(const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data, std::vector<uint8_t> data){
-	    return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // for commands with data
+      return gen_inf_cmd(this->addr_to[0], this->addr_to[1], whose, inf_cmd, run_cmd, next_data, data, data.size());} // for commands with data
     std::vector<uint8_t> gen_inf_cmd(const uint8_t to_addr1, const uint8_t to_addr2, const uint8_t whose, const uint8_t inf_cmd, const uint8_t run_cmd, const uint8_t next_data){
-	    return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // for commands with address and without data 	
-    	    
+      return gen_inf_cmd(to_addr1, to_addr2, whose, inf_cmd, run_cmd, next_data, {0x00}, 0);} // for commands with address and without data   
+          
     // generating cmd commands
-    std::vector<uint8_t> gen_control_cmd(const uint8_t control_cmd);	    	
-	
+    std::vector<uint8_t> gen_control_cmd(const uint8_t control_cmd);        
+  
     void init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device );
-    void send_array_cmd (std::vector<uint8_t> data);	
+    void send_array_cmd (std::vector<uint8_t> data);  
     void send_array_cmd (const uint8_t *data, size_t len);
 
 
@@ -465,17 +465,17 @@ class NiceBusT4 : public Component, public Cover {
 
     std::vector<uint8_t> rx_message_;                          // here the received message is accumulated byte by byte
     std::queue<std::vector<uint8_t>> tx_buffer_;             // queue of commands to send
-    bool ready_to_tx_{true};	                           // flag for sending commands
-	
+    bool ready_to_tx_{true};                             // flag for sending commands
+  
     std::vector<uint8_t> manufacturer_ = {0x55, 0x55};  // unknown manufacturer upon initialization
     std::vector<uint8_t> product_;
     std::vector<uint8_t> hardware_;
     std::vector<uint8_t> firmware_;
-    std::vector<uint8_t> description_;	
+    std::vector<uint8_t> description_;  
     std::vector<uint8_t> oxi_product;
     std::vector<uint8_t> oxi_hardware;
     std::vector<uint8_t> oxi_firmware;
-    std::vector<uint8_t> oxi_description;	
+    std::vector<uint8_t> oxi_description; 
 
 }; //Class
 

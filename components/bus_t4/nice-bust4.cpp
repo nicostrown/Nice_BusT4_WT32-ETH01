@@ -74,27 +74,27 @@ void NiceBusT4::setup() {
 
 void NiceBusT4::loop() {
 
-	if ((millis() - this->last_update_) > 10000) {    // every 10 seconds // If the drive is not detected the first time, we will try later
-			std::vector<uint8_t> unknown = {0x55, 0x55};
-			if (this->init_ok == false) {
+  if ((millis() - this->last_update_) > 10000) {    // every 10 seconds // If the drive is not detected the first time, we will try later
+      std::vector<uint8_t> unknown = {0x55, 0x55};
+      if (this->init_ok == false) {
         ESP_LOGI(TAG, "  Initialize device");
-				ESP_LOGI(TAG, "  Who is online request");
-				this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-				ESP_LOGI(TAG, "  Product request");
-				this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-			} else if (this->class_gate_ == 0x55) {
+        ESP_LOGI(TAG, "  Who is online request");
+        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+        ESP_LOGI(TAG, "  Product request");
+        this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+      } else if (this->class_gate_ == 0x55) {
         ESP_LOGI(TAG, "  Initialize device - class_gate == 0x55");
-				init_device(this->addr_to[0], this->addr_to[1], 0x04);  
-				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-			} else if (this->manufacturer_ == unknown)  {
+        init_device(this->addr_to[0], this->addr_to[1], 0x04);  
+        // this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+        // this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+      } else if (this->manufacturer_ == unknown)  {
         ESP_LOGI(TAG, "  Initialize device - manufacturer");
-				init_device(this->addr_to[0], this->addr_to[1], 0x04);  
-				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-				// this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-			}
-			this->last_update_ = millis();
-	}  // if  every minute
+        init_device(this->addr_to[0], this->addr_to[1], 0x04);  
+        // this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
+        // this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
+      }
+      this->last_update_ = millis();
+  }  // if  every minute
 
 
   // allow sending every 100 ms
@@ -125,7 +125,7 @@ void NiceBusT4::loop() {
   
   now = millis();
   if (init_ok && (current_operation != COVER_OPERATION_IDLE) && (now - last_position_time > POSITION_UPDATE_INTERVAL)) {
-  	last_position_time = now;
+    last_position_time = now;
     request_position();
   } 
   } // not robus
@@ -367,61 +367,61 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           //      default: // cmd_mnu
         case AUTOCLS:
           this->autocls_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");	
+          ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");  
           break;
           
         case PH_CLS_ON:
           this->photocls_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
           break;  
           
         case ALW_CLS_ON:
           this->alwayscls_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
           break;     
 
-				case STANDBY_ON:
+        case STANDBY_ON:
           this->standby_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");
           break; 
-	      
-				case START_ON:
+        
+        case START_ON:
           this->peak_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
           break; 
-	      
-				case BLINK_ON:
+        
+        case BLINK_ON:
           this->preflashing_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
           break; 
 
    //      case SLAVE_ON:
    //        this->close_to_popen_flag = data[14];
-	  // ESP_LOGCONFIG(TAG, "  Close becomes Partial open- L7: %S ", close_to_popen_flag ? "Yes" : "No");
+    // ESP_LOGCONFIG(TAG, "  Close becomes Partial open- L7: %S ", close_to_popen_flag ? "Yes" : "No");
    //        break; 
-	      
+        
         case SLAVE_ON:
           this->slavemode_flag = data[14];
-					ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
+          ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
           break; 
 
-	// level2 settings:
-				// case P_TIME:
-					// this->pause_time_level = data[14];
-					// ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level );
-					// break; 
-	      
+  // level2 settings:
+        // case P_TIME:
+          // this->pause_time_level = data[14];
+          // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level );
+          // break; 
+        
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
 
      if ((data[6] == INF) &&  (data[11] == GET - 0x81) && (data[13] == NOERR)) { // interested in incomplete responses to GET requests that came without errors from everyone
-	ESP_LOGI(TAG,  "Received an incomplete response to request %X, continued at offset %X", data[10], data[12] );
-	     // repeat the command with the new offset
-	tx_buffer_.push(gen_inf_cmd(data[4], data[5], data[9], data[10], GET, data[12]));
+  ESP_LOGI(TAG,  "Received an incomplete response to request %X, continued at offset %X", data[10], data[12] );
+       // repeat the command with the new offset
+  tx_buffer_.push(gen_inf_cmd(data[4], data[5], data[9], data[10], GET, data[12]));
      
      } // incomplete responses to GET requests that arrived without errors from the drive
 
-	  
+    
     
     if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == SET - 0x80) && (data[13] == NOERR)) { // I'm interested in responses to SET requests that came without errors from the drive   
       switch (data[10]) { // cmd_submnu
@@ -437,31 +437,31 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           tx_buffer_.push(gen_inf_cmd(FOR_CU, ALW_CLS_ON, GET)); // Always close
           break;  
 
-				case STANDBY_ON:
+        case STANDBY_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, STANDBY_ON, GET)); // Pre-flasing
           break;
-	      
-				case START_ON:
+        
+        case START_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // Pre-flasing
           break;
-	      
-				case BLINK_ON:
+        
+        case BLINK_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
           break;   
 
-				// case BLINK_ON:
-			 //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
-			 //          break;
+        // case BLINK_ON:
+       //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
+       //          break;
 
-				case SLAVE_ON:
-					tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
-					break;
+        case SLAVE_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
+          break;
 
-				//level 2 settings
-				// case P_TIME:
-			 //  	tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
-			 //   break;	      
-	      
+        //level 2 settings
+        // case P_TIME:
+       //   tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
+       //   break;        
+        
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
 
@@ -489,7 +489,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
             if (this->product_ == ROBUSHSR10) { 
               this->is_robus = true;
           //    ESP_LOGCONFIG(TAG, "  Drive unit ROBUS!: %S ", str.c_str());
-                                        }		  
+                                        }     
 
           }
           break;
@@ -562,78 +562,78 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         switch (data[10] + 0x80) { // sub_inf_cmd
           case RUN:
             ESP_LOGI(TAG, "RUN submenu");
-			if (data[11] >= 0x80) {
-			  switch (data[11] - 0x80) {  // sub_run_cmd1
-			    case SBS:
-			      ESP_LOGI(TAG, "Command: Step by step");
-			      break;
-			    case STOP:
-			      ESP_LOGI(TAG, "Command: STOP");
-			      break;
-			    case OPEN:
-			      ESP_LOGI(TAG, "Command: OPEN");
-			      this->current_operation = COVER_OPERATION_OPENING;
-			      break;
-			    case CLOSE:
-			      ESP_LOGI(TAG, "Command: CLOSE");
-			      this->current_operation = COVER_OPERATION_CLOSING;
-			      break;
-			    case P_OPN1:
-			      ESP_LOGI(TAG, "Command: Partial opening 1");
-			      break;
-			    case STOPPED:
-			      ESP_LOGI(TAG, "Command: Stopped");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      request_position();
-			      break;
-			    case ENDTIME:
-			      ESP_LOGI(TAG, "Operation timed out");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      request_position();
-			      break;
-			    default:
-			      ESP_LOGI(TAG, "Unknown command: %X", data[11]);
-			  }  // switch sub_run_cmd1
-			} else {
-			  switch (data[11]) {  // sub_run_cmd2
-			    case STA_OPENING:
-			      ESP_LOGI(TAG, "Operation: Opens");
-			      this->current_operation = COVER_OPERATION_OPENING;
-			      break;
-			    case STA_CLOSING:
-			      ESP_LOGI(TAG, "Operation: Closed");
-			      this->current_operation = COVER_OPERATION_CLOSING;
-			      break;
-			    case CLOSED:
-			      ESP_LOGI(TAG, "Operation: Closed");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      this->position = COVER_CLOSED;
-			      break;
-			    case OPENED:
-			      ESP_LOGI(TAG, "Operation: Open");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      this->position = COVER_OPEN;
-			      // calibrate opened position if the motor does not report max supported position (Road 400)
+      if (data[11] >= 0x80) {
+        switch (data[11] - 0x80) {  // sub_run_cmd1
+          case SBS:
+            ESP_LOGI(TAG, "Command: Step by step");
+            break;
+          case STOP:
+            ESP_LOGI(TAG, "Command: STOP");
+            break;
+          case OPEN:
+            ESP_LOGI(TAG, "Command: OPEN");
+            this->current_operation = COVER_OPERATION_OPENING;
+            break;
+          case CLOSE:
+            ESP_LOGI(TAG, "Command: CLOSE");
+            this->current_operation = COVER_OPERATION_CLOSING;
+            break;
+          case P_OPN1:
+            ESP_LOGI(TAG, "Command: Partial opening 1");
+            break;
+          case STOPPED:
+            ESP_LOGI(TAG, "Command: Stopped");
+            this->current_operation = COVER_OPERATION_IDLE;
+            request_position();
+            break;
+          case ENDTIME:
+            ESP_LOGI(TAG, "Operation timed out");
+            this->current_operation = COVER_OPERATION_IDLE;
+            request_position();
+            break;
+          default:
+            ESP_LOGI(TAG, "Unknown command: %X", data[11]);
+        }  // switch sub_run_cmd1
+      } else {
+        switch (data[11]) {  // sub_run_cmd2
+          case STA_OPENING:
+            ESP_LOGI(TAG, "Operation: Opens");
+            this->current_operation = COVER_OPERATION_OPENING;
+            break;
+          case STA_CLOSING:
+            ESP_LOGI(TAG, "Operation: Closed");
+            this->current_operation = COVER_OPERATION_CLOSING;
+            break;
+          case CLOSED:
+            ESP_LOGI(TAG, "Operation: Closed");
+            this->current_operation = COVER_OPERATION_IDLE;
+            this->position = COVER_CLOSED;
+            break;
+          case OPENED:
+            ESP_LOGI(TAG, "Operation: Open");
+            this->current_operation = COVER_OPERATION_IDLE;
+            this->position = COVER_OPEN;
+            // calibrate opened position if the motor does not report max supported position (Road 400)
                   if (this->_max_opn == 0) {
                     this->_max_opn = this->_pos_opn = this->_pos_usl;
                     ESP_LOGI(TAG, "Opened position calibrated");
                   }
-			      break;
-			    case STOPPED:
-			      ESP_LOGI(TAG, "Operation: Stopped");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      request_position();
-			      break;
-			    case PART_OPENED:
-			      ESP_LOGI(TAG, "Operation: Partially open");
-			      this->current_operation = COVER_OPERATION_IDLE;
-			      request_position();
-			      break;
-			    default:
-			      ESP_LOGI(TAG, "Unknown operation: %X", data[11]);
-			  }  // switch sub_run_cmd2
-			}
-			this->publish_state_if_changed();  // publish the status
+            break;
+          case STOPPED:
+            ESP_LOGI(TAG, "Operation: Stopped");
+            this->current_operation = COVER_OPERATION_IDLE;
+            request_position();
+            break;
+          case PART_OPENED:
+            ESP_LOGI(TAG, "Operation: Partially open");
+            this->current_operation = COVER_OPERATION_IDLE;
+            request_position();
+            break;
+          default:
+            ESP_LOGI(TAG, "Unknown operation: %X", data[11]);
+        }  // switch sub_run_cmd2
+      }
+      this->publish_state_if_changed();  // publish the status
             break; //RUN
 
           case STA:
@@ -886,13 +886,13 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
-  ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");	
+  ESP_LOGCONFIG(TAG, "  Stand-by - L4: %S ", standby_flag ? "Yes" : "No");  
   ESP_LOGCONFIG(TAG, "  Peak - L5: %S ", peak_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
-  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level);
+  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level);
 
 }
 
@@ -994,17 +994,17 @@ void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   uartFlush(_uart);                             // clear uart
   uartSetBaudRate(_uart, BAUD_BREAK);           // lower the body rate
   //uart_write(_uart, &br_ch, 1);               // for ESP8266                     // send zero at low speed, long zero
-  uart_write_bytes(UART_NUM_1, &br_ch, 1);	    // for ESP32		// send zero at low speed, long zero
+  uart_write_bytes(UART_NUM_1, &br_ch, 1);      // for ESP32    // send zero at low speed, long zero
   //uart_write(_uart, (char *)&dummy, 1);
   //uart_wait_tx_empty(_uart);                  // for ESP8266   // We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
-  uart_wait_tx_done(UART_NUM_1,100);		        // for ESP32			// We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
+  uart_wait_tx_done(UART_NUM_1,100);            // for ESP32      // We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
   delayMicroseconds(90);                        // add a delay to the wait, otherwise the speed will switch before sending. With delay on d1-mini I got a perfect signal, break = 520us
   uartSetBaudRate(_uart, BAUD_WORK);            // we return the working body rate
   //uart_write(_uart, (char *)&data[0], len);             // for ESP8266   // send the main package
-  uart_write_bytes(UART_NUM_1, (char *)&data[0], len);		// for ESP32		  // send the main package
+  uart_write_bytes(UART_NUM_1, (char *)&data[0], len);    // for ESP32      // send the main package
   //uart_write(_uart, (char *)raw_cmd_buf, sizeof(raw_cmd_buf));
   //uart_wait_tx_empty(_uart);          // for ESP8266     // waiting for the sending to complete
-  uart_wait_tx_done(UART_NUM_1,100);	  // for ESP32				// waiting for the sending to complete
+  uart_wait_tx_done(UART_NUM_1,100);    // for ESP32        // waiting for the sending to complete
   delayMicroseconds(90);
   //delayMicroseconds(150); //for ESP32
 
@@ -1041,7 +1041,7 @@ void NiceBusT4::set_mcu(std::string command, std::string data_command) {
 // device initialization
 void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device ) {
   if (device == FOR_CU) {
-		ESP_LOGI(TAG, "Checkinf motor settings");
+    ESP_LOGI(TAG, "Checkinf motor settings");
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, TYPE_M, GET, 0x00)); // drive type request
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, MAN, GET, 0x00)); // manufacturer's request
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, FRM, GET, 0x00)); //  firmware request
@@ -1059,7 +1059,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, AUTOCLS, GET, 0x00)); // Auto close
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, PH_CLS_ON, GET, 0x00)); // Close after Photo
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, ALW_CLS_ON, GET, 0x00)); // Always close
-    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, STANDBY_ON, GET, 0x00)); // Stand by	  
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, STANDBY_ON, GET, 0x00)); // Stand by    
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, START_ON, GET, 0x00)); // Peak
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, BLINK_ON, GET, 0x00)); // Pre-flashing
     //tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, CLOSE_TO_POPEN_ON, GET, 0x00)); // Close to Partial open
@@ -1067,7 +1067,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
 
     //level 2 settings  
     // tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time  
-	  
+    
   }
   if (device == FOR_OXI) {
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, PRD, GET, 0x00)); // product request
@@ -1077,8 +1077,8 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
   }
 
  //  for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
-	// send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
-	// send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
+  // send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+  // send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
  //        delayMicroseconds(1000000);
  //    }
 }
@@ -1101,9 +1101,9 @@ void NiceBusT4::update_position(uint16_t newpos) {
   publish_state_if_changed();  // publish the status
   
   if ((position_hook_type == STOP_UP && _pos_usl >= position_hook_value) || (position_hook_type == STOP_DOWN && _pos_usl <= position_hook_value)) {
-  	ESP_LOGI(TAG, "The required position has been reached. Stopping the gate");
-  	send_cmd(STOP);
-  	position_hook_type = IGNORE;
+    ESP_LOGI(TAG, "The required position has been reached. Stopping the gate");
+    send_cmd(STOP);
+    position_hook_type = IGNORE;
   }
 }
 

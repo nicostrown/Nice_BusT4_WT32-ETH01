@@ -93,7 +93,7 @@ void NiceBusT4::loop() {
 			this->last_update_ = millis();
 	}  // if  every minute
 
-	
+
   // allow sending every 100 ms
   uint32_t now = millis();
   if (now - this->last_uart_byte_ > 100) {
@@ -895,7 +895,6 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
 
 
 
-
 //formation of a management command
 std::vector<uint8_t> NiceBusT4::gen_control_cmd(const uint8_t control_cmd) {
   std::vector<uint8_t> frame = {this->addr_to[0], this->addr_to[1], this->addr_from[0], this->addr_from[1]}; // tytuł
@@ -959,14 +958,12 @@ void NiceBusT4::send_raw_cmd(std::string data) {
 
   std::vector < uint8_t > v_cmd = raw_cmd_prepare (data);
   send_array_cmd (&v_cmd[0], v_cmd.size());
-
 }
-
 
 //  Here you need to add a check for incorrect data from the user
 std::vector<uint8_t> NiceBusT4::raw_cmd_prepare (std::string data) { // preparing user-entered data for sending
-// remove everything except hexadecimal letters and numbers
-data.erase(remove_if(data.begin(), data.end(), [](const unsigned char ch) {
+  // remove everything except hexadecimal letters and numbers
+  data.erase(remove_if(data.begin(), data.end(), [](const unsigned char ch) {
     return (!(isxdigit(ch)) );
   }), data.end()); 
 
@@ -974,17 +971,14 @@ data.erase(remove_if(data.begin(), data.end(), [](const unsigned char ch) {
   std::vector < uint8_t > frame;
   frame.resize(0); // reset the command size
 
-  for (uint8_t i = 0; i < data.size (); i += 2 ) { // fill the command array
-    std::string sub_str(data, i, 2); // take 2 bytes from the command
-    char hexstoi = (char)std::strtol(&sub_str[0], 0 , 16); // convert to number
-    frame.push_back(hexstoi);  // write the number to the line element of the new command
+  for (uint8_t i = 0; i < data.size (); i += 2 ) {          // fill the command array
+    std::string sub_str(data, i, 2);                        // take 2 bytes from the command
+    char hexstoi = (char)std::strtol(&sub_str[0], 0 , 16);  // convert to number
+    frame.push_back(hexstoi);                               // write the number to the line element of the new command
   }
-
-
+  
   return frame;
-
 }
-
 
 
 void NiceBusT4::send_array_cmd (std::vector<uint8_t> data) {          // sends break + command prepared earlier in the array
@@ -993,31 +987,29 @@ void NiceBusT4::send_array_cmd (std::vector<uint8_t> data) {          // sends b
 void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
   // sending data to uart
 
-  char br_ch = 0x00;                                               // for break
-  uartFlush(_uart);                                               // clear uart
-  uartSetBaudRate(_uart, BAUD_BREAK);                            // lower the body rate
-  //uart_write(_uart, &br_ch, 1);               //for ESP8266                     // send zero at low speed, long zero
-  uart_write_bytes(UART_NUM_1, &br_ch, 1);	//for ESP32		// send zero at low speed, long zero
+  char br_ch = 0x00;                            // for break
+  uartFlush(_uart);                             // clear uart
+  uartSetBaudRate(_uart, BAUD_BREAK);           // lower the body rate
+  //uart_write(_uart, &br_ch, 1);               // for ESP8266                     // send zero at low speed, long zero
+  uart_write_bytes(UART_NUM_1, &br_ch, 1);	    // for ESP32		// send zero at low speed, long zero
   //uart_write(_uart, (char *)&dummy, 1);
-  //uart_wait_tx_empty(_uart);                  //for ESP8266                    // We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
-  uart_wait_tx_done(UART_NUM_1,100);		//for ESP32			// We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
-  delayMicroseconds(90);                                          // add a delay to the wait, otherwise the speed will switch before sending. With delay on d1-mini I got a perfect signal, break = 520us
-  uartSetBaudRate(_uart, BAUD_WORK);                             // we return the working body rate
-  //uart_write(_uart, (char *)&data[0], len);       //for ESP8266                          // send the main package
-  uart_write_bytes(UART_NUM_1, (char *)&data[0], len);		//for ESP32		// send the main package
+  //uart_wait_tx_empty(_uart);                  // for ESP8266   // We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
+  uart_wait_tx_done(UART_NUM_1,100);		        // for ESP32			// We wait until the sending is completed. There is an error here in the uart.h library (esp8266 core 3.0.2), waiting is not enough for further uart_set_baudrate().
+  delayMicroseconds(90);                        // add a delay to the wait, otherwise the speed will switch before sending. With delay on d1-mini I got a perfect signal, break = 520us
+  uartSetBaudRate(_uart, BAUD_WORK);            // we return the working body rate
+  //uart_write(_uart, (char *)&data[0], len);             // for ESP8266   // send the main package
+  uart_write_bytes(UART_NUM_1, (char *)&data[0], len);		// for ESP32		  // send the main package
   //uart_write(_uart, (char *)raw_cmd_buf, sizeof(raw_cmd_buf));
-  //uart_wait_tx_empty(_uart);          //for ESP8266                           // waiting for the sending to complete
-  uart_wait_tx_done(UART_NUM_1,100);	//for ESP32				// waiting for the sending to complete
+  //uart_wait_tx_empty(_uart);          // for ESP8266     // waiting for the sending to complete
+  uart_wait_tx_done(UART_NUM_1,100);	  // for ESP32				// waiting for the sending to complete
   delayMicroseconds(90);
   //delayMicroseconds(150); //for ESP32
-
 
 
   std::string pretty_cmd = format_hex_pretty((uint8_t*)&data[0], len);                    // to output the command to the log
   ESP_LOGI(TAG,  "Sent: %S ", pretty_cmd.c_str() );
 
 }
-
 
 // generating and sending inf commands from yaml configuration
 void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string command, std::string type_command, std::string next_data, bool data_on, std::string data_command) {
@@ -1035,18 +1027,6 @@ void NiceBusT4::send_inf_cmd(std::string to_addr, std::string whose, std::string
     tx_buffer_.push(gen_inf_cmd(v_to_addr[0], v_to_addr[1], v_whose[0], v_command[0], v_type_command[0], v_next_data[0]));
   } // else
 }
-
-//check all cmd
-// void NiceBusT4::check_cmd() {
-//     //int poczatek = 0x70;
-//     //int koniec = 0x9F;
-
-//     for(int licznik = 0x70; licznik <= 0x9F; ++licznik) {
-// 	send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
-// 	send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");     
-//         delayMicroseconds(1000000);
-//     }
-// }
 
 // generating and sending installation commands to the drive controller from yaml configuration with minimal parameters
 void NiceBusT4::set_mcu(std::string command, std::string data_command) {

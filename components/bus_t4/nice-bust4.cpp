@@ -82,7 +82,7 @@ void NiceBusT4::loop() {
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
         ESP_LOGI(TAG, "  Product request");
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-        ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %u ", pause_time_level);
+        // ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %u ", pause_time_level);
       } else if (this->class_gate_ == 0x55) {
         ESP_LOGI(TAG, "  Initialize device - class_gate == 0x55");
         init_device(this->addr_to[0], this->addr_to[1], 0x04);  
@@ -396,34 +396,33 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           ESP_LOGCONFIG(TAG, "  Pre-flasing - L6: %S ", preflashing_flag ? "Yes" : "No");
           break; 
 
-   //      case SLAVE_ON:
-   //        this->close_to_popen_flag = data[14];
-    // ESP_LOGCONFIG(TAG, "  Close becomes Partial open- L7: %S ", close_to_popen_flag ? "Yes" : "No");
-   //        break; 
+        // case SLAVE_ON:
+          // this->close_to_popen_flag = data[14];
+          // ESP_LOGCONFIG(TAG, "  Close becomes Partial open- L7: %S ", close_to_popen_flag ? "Yes" : "No");
+          // break; 
         
         case SLAVE_ON:
           this->slavemode_flag = data[14];
           ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
           break; 
 
-  // level2 settings:
-        // case P_TIME:
-          // this->pause_time_level = data[14];
-          // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %S ", pause_time_level );
-          // break; 
+        // level2 settings:
+        case P_TIME:
+          this->pause_time_level = data[14];
+          ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u", pause_time_level );
+          break; 
         
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
 
      if ((data[6] == INF) &&  (data[11] == GET - 0x81) && (data[13] == NOERR)) { // interested in incomplete responses to GET requests that came without errors from everyone
-  ESP_LOGI(TAG,  "Received an incomplete response to request %X, continued at offset %X", data[10], data[12] );
+       ESP_LOGI(TAG,  "Received an incomplete response to request %X, continued at offset %X", data[10], data[12] );
        // repeat the command with the new offset
-  tx_buffer_.push(gen_inf_cmd(data[4], data[5], data[9], data[10], GET, data[12]));
-     
+       tx_buffer_.push(gen_inf_cmd(data[4], data[5], data[9], data[10], GET, data[12]));
+
      } // incomplete responses to GET requests that arrived without errors from the drive
 
-    
-    
+
     if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == SET - 0x80) && (data[13] == NOERR)) { // I'm interested in responses to SET requests that came without errors from the drive   
       switch (data[10]) { // cmd_submnu
         case AUTOCLS:
@@ -687,7 +686,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         break; // FOR_ALL
       case 0x0A:
         ESP_LOGI(TAG,  "Receiver package" );
-        break; // пакет приёмника
+        break; // receiver package
       default: // cmd_mnu
         ESP_LOGI(TAG,  "Menu %X", data[9] );
     }  // switch  cmd_mnu
@@ -762,7 +761,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
       this->publish_state();  // publish the status
     } //if
   */
-  // STA = 0x40,   // статус в движении
+  // STA = 0x40,   // status in motion
   /*
     if ((data[1] == 0x0E) && (data[6] == CMD) && (data[9] == FOR_CU) && (data[10] == STA) ) { // we recognize the status packet by its content in certain bytes
       uint16_t ipos = (data[12] << 8) + data[13];
@@ -883,7 +882,8 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   
   std::string oxi_dsc_str(this->oxi_description.begin(), this->oxi_description.end());
   ESP_LOGCONFIG(TAG, "  Receiver Description: %S ", oxi_dsc_str.c_str());
- 
+
+  //settings - level 1
   ESP_LOGCONFIG(TAG, "  Auto close - L1: %S ", autocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Close after photo - L2: %S ", photocls_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Always close - L3: %S ", alwayscls_flag ? "Yes" : "No");
@@ -893,7 +893,9 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Close becomes Partial open - L7: %S ", close_to_popen_flag ? "Yes" : "No");
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
-  // ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %d ", pause_time_level);
+  //settings - level 2
+  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u ", pause_time_level);
+  
 
 }
 
@@ -1067,7 +1069,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SLAVE_ON, GET, 0x00)); // Slave mode
 
     //level 2 settings  
-    // tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time  
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time
     
   }
   if (device == FOR_OXI) {

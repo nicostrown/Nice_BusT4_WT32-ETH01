@@ -245,7 +245,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
     ESP_LOGI(TAG,  "Data string: %S ", str.c_str() );
     std::string pretty_data = format_hex_pretty(vec_data);
     ESP_LOGI(TAG,  "HEX data %S ", pretty_data.c_str() );
-    ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
+    // ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
     // We received a package with EVT data, we are starting to disassemble it
 
     if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == GET - 0x80) && (data[13] == NOERR)) { // interested in completed responses to GET requests that arrived without errors from the drive
@@ -558,7 +558,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
     ESP_LOGI(TAG,  "Data string: %S ", str.c_str() );
     std::string pretty_data = format_hex_pretty(vec_data);
     ESP_LOGI(TAG,  "HEX data %S ", pretty_data.c_str() );
-    ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
+    // ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
     switch (data[9]) { // cmd_mnu
       case FOR_CU:
         ESP_LOGI(TAG, "Drive Controller Package");

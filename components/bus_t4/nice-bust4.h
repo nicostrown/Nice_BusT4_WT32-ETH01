@@ -165,30 +165,30 @@ enum setup_submnu : uint8_t {
   MAX_OPN        = 0x12, // The maximum possible opening according to the encoder.
   POS_MAX        = 0x18, // Maximum position (opening) by encoder
   POS_MIN        = 0x19, // Minimum position (closing) by encoder
-  INF_P_OPN1     = 0x21, // Partial opening1
-  INF_P_OPN2     = 0x22, // Partial opening2
-  INF_P_OPN3     = 0x23, // Partial opening3
-  INF_SLOW_OPN   = 0x24, // Slowdown delay in opening
-  INF_SLOW_CLS   = 0x25, // Slowdown delay in closing
+  INF_P_OPN1     = 0x21, // Partial opening1 - default 1000
+  INF_P_OPN2     = 0x22, // Partial opening2 - default 3000
+  INF_P_OPN3     = 0x23, // Partial opening3 - default 4000
+  INF_SLOW_OPN   = 0x24, // Slowdown delay in opening - default 500
+  INF_SLOW_CLS   = 0x25, // Slowdown delay in closing - default 500
   
-  OPN_OFFSET     = 0x28, /* Opening delay open offset */
-  CLS_OFFSET     = 0x29, /* Delayed closing close offset */
-  OPN_DIS        = 0x2A, /* Main parameters - Opening unloading Open discharge */
-  CLS_DIS        = 0x2B, /* Main parameters - Close discharge Close discharge */
-  REV_TIME       = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
+  OPN_OFFSET     = 0x28, // Opening delay open offset - not available for ROBUS400
+  CLS_OFFSET     = 0x29, // Delayed closing close offset - not available for ROBUS400
+  OPN_DIS        = 0x2A, // Main parameters - Opening unloading Open discharge - not available for ROBUS400
+  CLS_DIS        = 0x2B, // Main parameters - Close discharge Close discharge - not available for ROBUS400
+  REV_TIME       = 0x31, // Main parameters - Closing unloading (Brief inversion value) - not available for ROBUS400
+  SPEED_OPN      = 0x42, // Basic parameters - Speed setting - Opening speed - default 60
+  SPEED_CLS      = 0x43, // Basic parameters - Speed setting - Closing speed - default 60
+  SPEED_SLW_OPN  = 0x45, // Basic parameters - Speed setting - Slow opening speed - default 22
+  SPEED_SLW_CLS  = 0x46, // Basic parameters - Speed setting - Slow closing speed - default 22
   OPN_PWR        = 0x4A, // Basic parameters - Force control - Opening force
   CLS_PWR        = 0x4B, // Basic parameters - Force control - Closing force
-  SPEED_OPN      = 0x42, // Basic parameters - Speed setting - Opening speed
-  SPEED_CLS      = 0x43, // Basic parameters - Speed setting - Closing speed
-  SPEED_SLW_OPN  = 0x45, // Basic parameters - Speed setting - Slow opening speed
-  SPEED_SLW_CLS  = 0x46, // Basic parameters - Speed setting - Slow closing speed 
   OUT1           = 0x51, // Output settings
   OUT2           = 0x52, // Output settings
   LOCK_TIME      = 0x5A, // Output settings - Lock operation time
   LAMP_TIME      = 0x5B, // Output settings - courtesy light time
   S_CUP_TIME     = 0x5C, // Output Setting - Suction Cup Time
   
-  COMM_SBS       = 0x61, // Setting up commands - Step by step
+  COMM_SBS       = 0x61, // Setting up commands - Step by step - l2L2 - level
   COMM_POPN      = 0x62, // Command Settings - Open Partially
   COMM_OPN       = 0x63, // Command settings - Open
   COMM_CLS       = 0x64, // Command Settings - Close
@@ -382,7 +382,7 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t motor_speed_level;  // l2L3 - motor speed 
     uint8_t step_by_step_level; // l2L4 - GOI output
     uint8_t motor_force_level;  // l2L5 - motor force
-    uint8_t p_open_level;       // l2L6 - partial open
+    uint8_t p_open_level;       // l2L6 - partial open - 0x21
     uint8_t maint_not_level;    // l2L7 - maintenance notification
     uint8_t fault_list_level;   // l2L8 - list of faults
     

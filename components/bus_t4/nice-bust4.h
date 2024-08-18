@@ -174,7 +174,7 @@ enum setup_submnu : uint8_t {
   OPN_OFFSET     = 0x28, /* Opening delay open offset */
   CLS_OFFSET     = 0x29, /* Delayed closing close offset */
   OPN_DIS        = 0x2A, /* Main parameters - Opening unloading Open discharge */
-  CLS_DIS        = 0x2B, /* Основные параметры - Разгрузка закрытия Close discharge */
+  CLS_DIS        = 0x2B, /* Main parameters - Close discharge Close discharge */
   REV_TIME       = 0x31, /* Main parameters - Closing unloading (Brief inversion value) */
   OPN_PWR        = 0x4A, // Basic parameters - Force control - Opening force
   CLS_PWR        = 0x4B, // Basic parameters - Force control - Closing force
@@ -230,7 +230,7 @@ enum setup_submnu : uint8_t {
   SLOW_ON        = 0xA2, // Main parameters - Slowdown
   DIS_VAL        = 0xA4, /* Position - Value is not allowed - disable value */
   P_COUNT        = 0xB2, /* Partial count - Dedicated counter*/
-  C_MAIN         = 0xB4, /* Cancel maintenance Отмена обслуживания */
+  C_MAIN         = 0xB4, /* Cancel maintenance */
   DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */ 
   INF_IO         = 0xD1, /* Input-output status */
   DIAG_PAR       = 0xD2, /* DIAGNOSTICS of other parameters */
@@ -254,34 +254,34 @@ enum run_cmd : uint8_t {
 11th byte of the CMD packet
 Used in requests and responses */
 enum control_cmd : uint8_t {
-  SBS = 0x01, // Step by Step
-  STOP = 0x02,   /* Stop */
-  OPEN = 0x03,   /* Open */
-  CLOSE = 0x04,  /* Close */
+  SBS    = 0x01, // Step by Step
+  STOP   = 0x02, /* Stop */
+  OPEN   = 0x03, /* Open */
+  CLOSE  = 0x04, /* Close */
   P_OPN1 = 0x05, /* Partial opening 1 */
   P_OPN2 = 0x06, /* Partial opening 2 */
   P_OPN3 = 0x07, /* Partial opening 3 */
-  RSP = 0x19, /* interface response acknowledging receipt of the command  */
-  EVT = 0x29, /* interface response sending the requested information */
+  RSP    = 0x19, /* interface response acknowledging receipt of the command */
+  EVT    = 0x29, /* interface response sending the requested information */
 
-  P_OPN4 = 0x0b, /* Partial opening 4 - shared */
-  P_OPN5 = 0x0c, /* Partial opening 5 - Priority step by step */
-  P_OPN6 = 0x0d, /* Partial opening 6 - Open and block */
-  UNLK_OPN = 0x19, /* Unlock and open */
-  CLS_LOCK = 0x0E, /* Close and block */
-  UNLCK_CLS = 0x1A, /*  Unlock and close */
-  LOCK = 0x0F, /* Lock */
-  UNLOCK = 0x10, /* Unlock */
+  P_OPN4      = 0x0b, /* Partial opening 4 - shared */
+  P_OPN5      = 0x0c, /* Partial opening 5 - Priority step by step */
+  P_OPN6      = 0x0d, /* Partial opening 6 - Open and block */
+  UNLK_OPN    = 0x19, /* Unlock and open */
+  CLS_LOCK    = 0x0E, /* Close and block */
+  UNLCK_CLS   = 0x1A, /*  Unlock and close */
+  LOCK        = 0x0F, /* Lock */
+  UNLOCK      = 0x10, /* Unlock */
   LIGHT_TIMER = 0x11, /* Light timer */
-  LIGHT_SW = 0x12, /* Light on/off */
-  HOST_SBS = 0x13, /* Host SBS */
-  HOST_OPN = 0x14, /* Lead open */
-  HOST_CLS = 0x15, /* Lead close */
-  SLAVE_SBS = 0x16, /* Slave SBS */
-  SLAVE_OPN = 0x17, /* Slave open */
-  SLAVE_CLS = 0x18, /* Slave close */
-  AUTO_ON = 0x1B, /* Auto open active */
-  AUTO_OFF = 0x1C, /* Auto open inactive */
+  LIGHT_SW    = 0x12, /* Light on/off */
+  HOST_SBS    = 0x13, /* Host SBS */
+  HOST_OPN    = 0x14, /* Lead open */
+  HOST_CLS    = 0x15, /* Lead close */
+  SLAVE_SBS   = 0x16, /* Slave SBS */
+  SLAVE_OPN   = 0x17, /* Slave open */
+  SLAVE_CLS   = 0x18, /* Slave close */
+  AUTO_ON     = 0x1B, /* Auto open active */
+  AUTO_OFF    = 0x1C, /* Auto open inactive */
 };
 
   
@@ -367,19 +367,45 @@ class NiceBusT4 : public Component, public Cover {
   public:
   
     //  drive settings
-    bool autocls_flag; // Auto close - L1
-    bool photocls_flag; // Close after photo - L2
-    bool alwayscls_flag; // Always Close - L3
-    bool standby_flag; // Stand-By - L4
-    bool peak_flag; // Peak - L5
-    bool preflashing_flag; //Pre-flashing - L6
+    bool autocls_flag;        // Auto close - L1
+    bool photocls_flag;       // Close after photo - L2
+    bool alwayscls_flag;      // Always Close - L3
+    bool standby_flag;        // Stand-By - L4
+    bool peak_flag;           // Peak - L5
+    bool preflashing_flag;    //Pre-flashing - L6
     bool close_to_popen_flag; //“Close” becomes “Partial open” - L7
-    bool slavemode_flag; //“Slave” mode - L8
+    bool slavemode_flag;      //“Slave” mode - L8
 
     //level 2 settings
-    uint8_t pause_time_level; // l2L1 - Pause time
+    uint8_t pause_time;   // l2L1 - Pause time
+    uint8_t step_by_step_mode; // l2L2 - Step by step mode
+    uint8_t motor_speed_level;  // l2L3 - motor speed 
+    uint8_t step_by_step_level; // l2L4 - GOI output
+    uint8_t motor_force_level;  // l2L5 - motor force
+    uint8_t p_open_level;       // l2L6 - partial open
+    uint8_t maint_not_level;    // l2L7 - maintenance notification
+    uint8_t fault_list_level;   // l2L8 - list of faults
     
-    bool init_ok = false; //  drive detection when turned on
+    //additional parameters values
+    uint8_t current_position;
+    uint8_t opn_offset     /* = 0x28, Opening delay open offset */
+    uint8_t cls_offset     /* = 0x29, Delayed closing close offset */
+    uint8_t opn_dis        /* = 0x2A, Main parameters - Opening unloading Open discharge */
+    uint8_t cls_dis        /* = 0x2B, Main parameters - Close discharge Close discharge */
+    uint8_t rev_time       /* = 0x31, Main parameters - Closing unloading (Brief inversion value) */
+    uint8_t opn_pwr        // = 0x4A, Basic parameters - Force control - Opening force
+    uint8_t cls_pwr        // = 0x4B, Basic parameters - Force control - Closing force
+    uint8_t speed_opn      // = 0x42, Basic parameters - Speed setting - Opening speed
+    uint8_t speed_cls      // = 0x43, Basic parameters - Speed setting - Closing speed
+    uint8_t speed_slw_opn  // = 0x45, Basic parameters - Speed setting - Slow opening speed
+    uint8_t speed_slw_cls  // = 0x46, Basic parameters - Speed setting - Slow closing speed 
+    uint8_t out1           // = 0x51, Output settings
+    uint8_t out2           // = 0x52, Output settings
+    uint8_t lock_time      // = 0x5A, Output settings - Lock operation time
+    uint8_t lamp_time      // = 0x5B, Output settings - courtesy light time
+    uint8_t s_cup_time     // = 0x5C, Output Setting - Suction Cup Time
+    
+    bool init_ok = false;  // drive detection when turned on
     bool is_walky = false; // the position request command is different for walky
     bool is_robus = false; // for Robus there is no need to periodically request a position
     

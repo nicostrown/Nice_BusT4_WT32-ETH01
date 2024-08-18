@@ -82,7 +82,7 @@ void NiceBusT4::loop() {
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
         ESP_LOGI(TAG, "  Product request");
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-        // ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %u ", pause_time_level);
+        // ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %u ", pause_time);
       } else if (this->class_gate_ == 0x55) {
         ESP_LOGI(TAG, "  Initialize device - class_gate == 0x55");
         init_device(this->addr_to[0], this->addr_to[1], 0x04);  
@@ -245,6 +245,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
     ESP_LOGI(TAG,  "Data string: %S ", str.c_str() );
     std::string pretty_data = format_hex_pretty(vec_data);
     ESP_LOGI(TAG,  "HEX data %S ", pretty_data.c_str() );
+    ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
     // We received a package with EVT data, we are starting to disassemble it
 
     if ((data[6] == INF) && (data[9] == FOR_CU)  && (data[11] == GET - 0x80) && (data[13] == NOERR)) { // interested in completed responses to GET requests that arrived without errors from the drive
@@ -324,6 +325,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
             update_position(data[15]);
           else
             update_position((data[14] << 8) + data[15]);
+            current_position = (data[14] << 8) + data[15];
           break;
 
         case INF_STATUS:
@@ -408,8 +410,8 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
 
         // level2 settings:
         case P_TIME:
-          this->pause_time_level = data[14];
-          ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u", pause_time_level );
+          this->pause_time = data[14];
+          ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break; 
         
       } // switch cmd_submnu
@@ -449,18 +451,18 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
           break;   
 
-        // case BLINK_ON:
-       //          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
-       //          break;
+        case BLINK_ON:
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
+          break;
 
         case SLAVE_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing
           break;
 
-        //level 2 settings
-        // case P_TIME:
-       //   tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
-       //   break;        
+        // level 2 settings
+        case P_TIME:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
+         break;
         
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
@@ -556,6 +558,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
     ESP_LOGI(TAG,  "Data string: %S ", str.c_str() );
     std::string pretty_data = format_hex_pretty(vec_data);
     ESP_LOGI(TAG,  "HEX data %S ", pretty_data.c_str() );
+    ESP_LOGI(TAG,  "Dane wektorowe %S ", vec_data.c_str() );
     switch (data[9]) { // cmd_mnu
       case FOR_CU:
         ESP_LOGI(TAG, "Drive Controller Package");
@@ -894,7 +897,7 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Slave mode - L8: %S ", slavemode_flag ? "Yes" : "No");
 
   //settings - level 2
-  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u ", pause_time_level);
+  ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u ", pause_time);
   
 
 }

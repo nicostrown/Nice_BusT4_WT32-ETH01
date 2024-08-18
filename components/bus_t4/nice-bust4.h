@@ -388,22 +388,22 @@ class NiceBusT4 : public Component, public Cover {
     
     //additional parameters values
     uint8_t current_position;
-    uint8_t opn_offset     /* = 0x28, Opening delay open offset */
-    uint8_t cls_offset     /* = 0x29, Delayed closing close offset */
-    uint8_t opn_dis        /* = 0x2A, Main parameters - Opening unloading Open discharge */
-    uint8_t cls_dis        /* = 0x2B, Main parameters - Close discharge Close discharge */
-    uint8_t rev_time       /* = 0x31, Main parameters - Closing unloading (Brief inversion value) */
-    uint8_t opn_pwr        // = 0x4A, Basic parameters - Force control - Opening force
-    uint8_t cls_pwr        // = 0x4B, Basic parameters - Force control - Closing force
-    uint8_t speed_opn      // = 0x42, Basic parameters - Speed setting - Opening speed
-    uint8_t speed_cls      // = 0x43, Basic parameters - Speed setting - Closing speed
-    uint8_t speed_slw_opn  // = 0x45, Basic parameters - Speed setting - Slow opening speed
-    uint8_t speed_slw_cls  // = 0x46, Basic parameters - Speed setting - Slow closing speed 
-    uint8_t out1           // = 0x51, Output settings
-    uint8_t out2           // = 0x52, Output settings
-    uint8_t lock_time      // = 0x5A, Output settings - Lock operation time
-    uint8_t lamp_time      // = 0x5B, Output settings - courtesy light time
-    uint8_t s_cup_time     // = 0x5C, Output Setting - Suction Cup Time
+    uint8_t opn_offset;     /* = 0x28, Opening delay open offset */
+    uint8_t cls_offset;     /* = 0x29, Delayed closing close offset */
+    uint8_t opn_dis;        /* = 0x2A, Main parameters - Opening unloading Open discharge */
+    uint8_t cls_dis;        /* = 0x2B, Main parameters - Close discharge Close discharge */
+    uint8_t rev_time;       /* = 0x31, Main parameters - Closing unloading (Brief inversion value) */
+    uint8_t opn_pwr;        // = 0x4A, Basic parameters - Force control - Opening force
+    uint8_t cls_pwr;        // = 0x4B, Basic parameters - Force control - Closing force
+    uint8_t speed_opn;      // = 0x42, Basic parameters - Speed setting - Opening speed
+    uint8_t speed_cls;      // = 0x43, Basic parameters - Speed setting - Closing speed
+    uint8_t speed_slw_opn;  // = 0x45, Basic parameters - Speed setting - Slow opening speed
+    uint8_t speed_slw_cls;  // = 0x46, Basic parameters - Speed setting - Slow closing speed 
+    uint8_t out1;           // = 0x51, Output settings
+    uint8_t out2;           // = 0x52, Output settings
+    uint8_t lock_time;      // = 0x5A, Output settings - Lock operation time
+    uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
+    uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
     
     bool init_ok = false;  // drive detection when turned on
     bool is_walky = false; // the position request command is different for walky

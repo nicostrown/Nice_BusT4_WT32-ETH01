@@ -440,20 +440,20 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           break;  
 
         case STANDBY_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, STANDBY_ON, GET)); // Pre-flasing
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, STANDBY_ON, GET)); // Standby
           break;
         
         case START_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // Pre-flasing
+          tx_buffer_.push(gen_inf_cmd(FOR_CU, START_ON, GET)); // peak
           break;
         
         case BLINK_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
           break;   
 
-        case BLINK_ON:
-          tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Pre-flasing
-          break;
+        // case BLINK_ON:
+          // tx_buffer_.push(gen_inf_cmd(FOR_CU, BLINK_ON, GET)); // Close becomes partial open
+          // break;
 
         case SLAVE_ON:
           tx_buffer_.push(gen_inf_cmd(FOR_CU, SLAVE_ON, GET)); // Pre-flasing

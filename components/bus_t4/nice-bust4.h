@@ -379,12 +379,13 @@ class NiceBusT4 : public Component, public Cover {
     //level 2 settings
     uint8_t pause_time;         // l2L1 - Pause time
     uint8_t step_by_step_mode;  // l2L2 - Step by step mode
-    uint8_t motor_speed_level;  // l2L3 - motor speed 
-    uint8_t step_by_step_level; // l2L4 - GOI output
-    uint8_t motor_force_level;  // l2L5 - motor force
-    uint8_t p_open_level;       // l2L6 - partial open - 0x21
-    uint8_t maint_not_level;    // l2L7 - maintenance notification
-    uint8_t fault_list_level;   // l2L8 - list of faults
+    uint8_t motor_speed_open;   // l2L3 - motor speed 
+    uint8_t motor_speed_close;  // l2L3 - motor speed
+    uint8_t SCA_mode;           // l2L4 - GOI output
+    uint8_t motor_force;        // l2L5 - motor force
+    uint8_t p_open_mode;       // l2L6 - partial open - 0x21
+    uint8_t maint_not_mode;    // l2L7 - maintenance notification
+    uint8_t fault_list_mode;   // l2L8 - list of faults
     
     //additional parameters values
     uint8_t current_position;

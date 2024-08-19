@@ -188,7 +188,7 @@ enum setup_submnu : uint8_t {
   LAMP_TIME      = 0x5B, // Output settings - courtesy light time
   S_CUP_TIME     = 0x5C, // Output Setting - Suction Cup Time
   
-  COMM_SBS       = 0x61, // Setting up commands - Step by step - l2L2 - level
+  COMM_SBS       = 0x61, // Setting up commands - Step by step - l2L2 - level, default: 2
   COMM_POPN      = 0x62, // Command Settings - Open Partially
   COMM_OPN       = 0x63, // Command settings - Open
   COMM_CLS       = 0x64, // Command Settings - Close

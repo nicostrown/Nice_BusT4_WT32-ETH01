@@ -412,6 +412,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         // level2 settings:
         case P_TIME:
           this->pause_time = data[14];
+          id(pause_time_number).set_value(pause_time);
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break; 
         

@@ -372,13 +372,13 @@ class NiceBusT4 : public Component, public Cover {
     bool alwayscls_flag;      // Always Close - L3
     bool standby_flag;        // Stand-By - L4
     bool peak_flag;           // Peak - L5
-    bool preflashing_flag;    //Pre-flashing - L6
-    bool close_to_popen_flag; //“Close” becomes “Partial open” - L7
-    bool slavemode_flag;      //“Slave” mode - L8
+    bool preflashing_flag;    // Pre-flashing - L6
+    bool close_to_popen_flag; // “Close” becomes “Partial open” - L7
+    bool slavemode_flag;      // “Slave” mode - L8
 
     //level 2 settings
-    uint8_t pause_time;   // l2L1 - Pause time
-    uint8_t step_by_step_mode; // l2L2 - Step by step mode
+    uint8_t pause_time;         // l2L1 - Pause time
+    uint8_t step_by_step_mode;  // l2L2 - Step by step mode
     uint8_t motor_speed_level;  // l2L3 - motor speed 
     uint8_t step_by_step_level; // l2L4 - GOI output
     uint8_t motor_force_level;  // l2L5 - motor force
@@ -388,6 +388,7 @@ class NiceBusT4 : public Component, public Cover {
     
     //additional parameters values
     uint8_t current_position;
+    uint16_t max_encoder_position;
     uint8_t opn_offset;     /* = 0x28, Opening delay open offset */
     uint8_t cls_offset;     /* = 0x29, Delayed closing close offset */
     uint8_t opn_dis;        /* = 0x2A, Main parameters - Opening unloading Open discharge */

@@ -305,6 +305,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           }
           else {  
             this->_max_opn = (data[14] << 8) + data[15];
+            max_encoder_position = this->_max_opn;
           }
           ESP_LOGI(TAG, "Maximum encoder position: %d", this->_max_opn);
           break;

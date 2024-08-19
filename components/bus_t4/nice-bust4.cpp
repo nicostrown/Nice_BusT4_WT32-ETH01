@@ -415,15 +415,20 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           // id(pause_time_number).set_value(pause_time);
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;
+        
+        case COMM_SBS:
+          this->step_by_step_mode = data[14];
+          ESP_LOGCONFIG(TAG, "  Step by step mode - settings level 2, L2: %u", step_by_step_mode ); 
+          break;
           
         case SPEED_OPN:
           this->motor_speed_open = data[14];
-          ESP_LOGCONFIG(TAG, "  Motor speed open - settings level 2, L3: %u", motor_speed_open ); //in seconds
+          ESP_LOGCONFIG(TAG, "  Motor speed open - settings level 2, L3: %u", motor_speed_open ); 
           break;
           
         case SPEED_CLS:
           this->motor_speed_close = data[14];
-          ESP_LOGCONFIG(TAG, "  Motor speed close - settings level 2, L3: %u", motor_speed_close ); //in seconds
+          ESP_LOGCONFIG(TAG, "  Motor speed close - settings level 2, L3: %u", motor_speed_close ); 
           break;
         
       } // switch cmd_submnu
@@ -475,10 +480,15 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         case P_TIME:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
          break;
-         
+
+        case COMM_SBS:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, COMM_SBS, GET)); // pause time
+         break;
+
         case SPEED_OPN:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_OPN, GET)); // pause time
-         break; 
+         break;
+         
         case SPEED_CLS:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_CLS, GET)); // pause time
          break;
@@ -917,9 +927,9 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
 
   //settings - level 2
   ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u ", pause_time);
-  
-  ESP_LOGCONFIG(TAG, "  Motor speed open - level 2, L1: %u ", motor_speed_open);
-  ESP_LOGCONFIG(TAG, "  Motor speed close - level 2, L1: %u ", motor_speed_close);
+  ESP_LOGCONFIG(TAG, "  Step by step mode - level 2, L2: %u ", step_by_step_mode);
+  ESP_LOGCONFIG(TAG, "  Motor speed open - level 2, L3: %u ", motor_speed_open);
+  ESP_LOGCONFIG(TAG, "  Motor speed close - level 2, L3: %u ", motor_speed_close);
 
 }
 
@@ -1094,6 +1104,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
 
     //level 2 settings  
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, COMM_SBS, GET, 0x00)); // Pause time
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_OPN, GET, 0x00)); // Speed open
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_CLS, GET, 0x00)); // Speed close
     

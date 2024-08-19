@@ -381,7 +381,7 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t step_by_step_mode;  // l2L2 - Step by step mode
     uint8_t motor_speed_open;   // l2L3 - motor speed 
     uint8_t motor_speed_close;  // l2L3 - motor speed
-    uint8_t SCA_mode;           // l2L4 - GOI output
+    uint8_t GOI_mode;           // l2L4 - GOI output
     uint8_t motor_force;        // l2L5 - motor force
     uint8_t p_open_mode;       // l2L6 - partial open - 0x21
     uint8_t maint_not_mode;    // l2L7 - maintenance notification

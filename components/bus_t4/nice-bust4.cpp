@@ -414,7 +414,17 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           this->pause_time = data[14];
           // id(pause_time_number).set_value(pause_time);
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
-          break; 
+          break;
+          
+        case SPEED_OPN:
+          this->motor_speed_open = data[14];
+          ESP_LOGCONFIG(TAG, "  Motor speed open - settings level 2, L3: %u", motor_speed_open ); //in seconds
+          break;
+          
+        case SPEED_CLS:
+          this->motor_speed_close = data[14];
+          ESP_LOGCONFIG(TAG, "  Motor speed close - settings level 2, L3: %u", motor_speed_close ); //in seconds
+          break;
         
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
@@ -464,6 +474,13 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         // level 2 settings
         case P_TIME:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, P_TIME, GET)); // pause time
+         break;
+         
+        case SPEED_OPN:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_OPN, GET)); // pause time
+         break; 
+        case SPEED_CLS:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_CLS, GET)); // pause time
          break;
         
       }// switch cmd_submnu
@@ -901,6 +918,8 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   //settings - level 2
   ESP_LOGCONFIG(TAG, "  Pause time level - level 2, L1: %u ", pause_time);
   
+  ESP_LOGCONFIG(TAG, "  Motor speed open - level 2, L1: %u ", motor_speed_open);
+  ESP_LOGCONFIG(TAG, "  Motor speed close - level 2, L1: %u ", motor_speed_close);
 
 }
 
@@ -1075,6 +1094,8 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
 
     //level 2 settings  
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_OPN, GET, 0x00)); // Speed open
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_CLS, GET, 0x00)); // Speed close
     
   }
   if (device == FOR_OXI) {

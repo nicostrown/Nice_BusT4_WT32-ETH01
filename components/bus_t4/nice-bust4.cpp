@@ -69,7 +69,10 @@ void NiceBusT4::setup() {
   _uart =  uartBegin(_UART_NO, BAUD_WORK, SERIAL_8N1, RX_PIN, TX_PIN, 256, 256, false, 112); //for WT32
   // who's online?
 //  this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-  
+  if (this->pause_time_sensor == nullptr) {
+    this->pause_time_sensor = id(pause_time_sensor);
+    ESP_LOGD("setup", "pause_time_sensor został przypisany w setup: %p", this->pause_time_sensor);
+  }
 
 }
 

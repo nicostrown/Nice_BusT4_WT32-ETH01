@@ -230,7 +230,7 @@ bool NiceBusT4::validate_message_() {                    // checking the receive
 
 // parse the received packages
 void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
-  ESP_LOGD("debug", "Wywołanie parse_status_packet");
+  // ESP_LOGD("debug", "Wywołanie parse_status_packet");
   if ((data[1] == 0x0d) && (data[13] == 0xFD)) { // error
     ESP_LOGE(TAG,  "Command not available for this device" );
   }

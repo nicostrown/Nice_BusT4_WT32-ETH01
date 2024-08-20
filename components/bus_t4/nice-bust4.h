@@ -57,7 +57,7 @@ is an intelligent engine, this value is 1 (adr = 1).
 #include <queue>                               // for working with a queue
 #include <string>
 #include "esphome/components/text_sensor/text_sensor.h"
-#include "esphome/components/text_sensor/template_text_sensor.h"
+// #include "esphome/components/text_sensor/template_text_sensor.h"
 
 namespace esphome {
 namespace bus_t4 {

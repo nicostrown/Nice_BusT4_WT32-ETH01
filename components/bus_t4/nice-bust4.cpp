@@ -10,7 +10,7 @@ static const char *TAG = "bus_t4.cover";
 
 using namespace esphome::cover;
 
-uint8_t moja_zmienna = 0;
+// uint8_t moja_zmienna = 0;
 
 // NiceBusT4::NiceBusT4(text_sensor::TextSensor *sensor) {  // Konstruktor przypisujący wskaźnik do text_sensor
   // this->pause_time_sensor = sensor;

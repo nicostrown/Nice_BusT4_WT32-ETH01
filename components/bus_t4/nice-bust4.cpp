@@ -82,7 +82,6 @@ void NiceBusT4::loop() {
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
         ESP_LOGI(TAG, "  Product request");
         this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, PRD, GET, 0x00)); //product request
-        // ESP_LOGCONFIG(TAG, "DEBUG - Pause time level %u ", pause_time);
       } else if (this->class_gate_ == 0x55) {
         ESP_LOGI(TAG, "  Initialize device - class_gate == 0x55");
         init_device(this->addr_to[0], this->addr_to[1], 0x04);  
@@ -412,6 +411,7 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         // level2 settings:
         case P_TIME:
           this->pause_time = data[14];
+          App.get_text_sensor("pause_time_sensor")->publish_state(String(pause_time).c_str()); // Wywołanie funkcji w ESPHome, która zaktualizuje text_sensor
           // id(pause_time_number).set_value(pause_time);
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;
@@ -1104,7 +1104,7 @@ void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uin
 
     //level 2 settings  
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time
-    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, COMM_SBS, GET, 0x00)); // Pause time
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, COMM_SBS, GET, 0x00)); // Step by step mode
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_OPN, GET, 0x00)); // Speed open
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_CLS, GET, 0x00)); // Speed close
     

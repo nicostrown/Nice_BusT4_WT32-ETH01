@@ -408,7 +408,7 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
     uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
     
-    esphome::text_sensor::TextSensor *pause_time_sensor{nullptr};  // Wskaźnik do TextSensor
+    // esphome::text_sensor::TextSensor *pause_time_sensor{nullptr};  // Wskaźnik do TextSensor
     // void set_pause_time(uint8_t nowy_pause_time);
     // text_sensor::TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
     // NiceBusT4() : pause_time_sensor(nullptr) {}  // Domyślny konstruktor

@@ -411,10 +411,11 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
         // level2 settings:
         case P_TIME:
           this->pause_time = data[14];
-          auto *sensor = App.get_text_sensor("pause_time_sensor"); // Pobierz wskaźnik do text_sensor o nazwie "pause_time_sensor"
-          if (sensor != nullptr) {
-            sensor->publish_state(String(new_value).c_str());  // Wywołanie funkcji w ESPHome, która zaktualizuje text_sensor
-          } 
+          // auto *sensor = App.get_text_sensors("pause_time_sensor"); // Pobierz wskaźnik do text_sensor o nazwie "pause_time_sensor"
+          // if (sensor != nullptr) {
+            // sensor->publish_state(String(pause_time).c_str());  // Wywołanie funkcji w ESPHome, która zaktualizuje text_sensor
+          // }
+          id(pause_time_sensor).publish_state(String(pause_time).c_str());
           // id(pause_time_number).set_value(pause_time);
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;

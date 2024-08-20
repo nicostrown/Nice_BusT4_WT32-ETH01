@@ -230,6 +230,7 @@ bool NiceBusT4::validate_message_() {                    // checking the receive
 
 // parse the received packages
 void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
+  ESP_LOGD("debug", "Wywołanie parse_status_packet");
   if ((data[1] == 0x0d) && (data[13] == 0xFD)) { // error
     ESP_LOGE(TAG,  "Command not available for this device" );
   }
@@ -418,7 +419,7 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
             ESP_LOGD("debug", "Aktualizacja pause_time_sensor: %p", pause_time_sensor);
             pause_time_sensor->publish_state(String(pause_time).c_str());
           } else {
-            ESP_LOGW("debug", "pause_time_sensor jest nullptr");
+            ESP_LOGW("debug", "pause_time_sensor jest nullptr w parse_status_packet");
           }
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;

@@ -407,8 +407,8 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
     uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
     
-    TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
-    NiceBusT4(TextSensor *sensor);  // Konstruktor przyjmujący wskaźnik do text_sensor
+    text_sensor::TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
+    NiceBusT4(text_sensor::TextSensor *sensor);  // Konstruktor przyjmujący wskaźnik do text_sensor
     
     bool init_ok = false;  // drive detection when turned on
     bool is_walky = false; // the position request command is different for walky

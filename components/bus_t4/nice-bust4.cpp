@@ -415,7 +415,10 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           // id(pause_time_sensor).publish_state(String(pause_time).c_str()); //Update sensor with id pause_time_sensor
           // id(pause_time_number).set_value(pause_time);
           if (pause_time_sensor != nullptr) { // Aktualizacja wartości sensora, jeśli wskaźnik jest poprawnie ustawiony
+            ESP_LOGD("debug", "Aktualizacja pause_time_sensor: %p", pause_time_sensor);
             pause_time_sensor->publish_state(String(pause_time).c_str());
+          } else {
+            ESP_LOGW("debug", "pause_time_sensor jest nullptr");
           }
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;

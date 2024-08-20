@@ -72,6 +72,8 @@ void NiceBusT4::setup() {
   if (this->pause_time_sensor == nullptr) {
     this->pause_time_sensor = id(pause_time_sensor);
     ESP_LOGD("setup", "pause_time_sensor został przypisany w setup: %p", this->pause_time_sensor);
+  } else {
+    ESP_LOGW("setup", "pause_time_sensor nie został przypisany");
   }
 
 }

@@ -55,7 +55,7 @@ is an intelligent engine, this value is 1 (adr = 1).
 #include <HardwareSerial.h>
 #include "esphome/core/helpers.h"              // parse strings with built-in tools
 #include <queue>                               // for working with a queue
-
+#include <string>
 
 
 namespace esphome {
@@ -377,7 +377,7 @@ class NiceBusT4 : public Component, public Cover {
     bool slavemode_flag;      // “Slave” mode - L8
 
     //level 2 settings
-    uint8_t pause_time;         // l2L1 - Pause time
+    uint8_t pause_time;         // l2L1 - Pause time  //extern 
     uint8_t step_by_step_mode;  // l2L2 - Step by step mode
     uint8_t motor_speed_open;   // l2L3 - motor speed 
     uint8_t motor_speed_close;  // l2L3 - motor speed
@@ -407,8 +407,9 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
     uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
     
-    text_sensor::TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
-    NiceBusT4() : pause_time_sensor(nullptr) {}  // Domyślny konstruktor
+    // void set_pause_time(uint8_t nowy_pause_time);
+    // text_sensor::TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
+    // NiceBusT4() : pause_time_sensor(nullptr) {}  // Domyślny konstruktor
     // NiceBusT4(text_sensor::TextSensor *sensor) : pause_time_sensor(sensor) {}  // Konstruktor przyjmujący wskaźnik do text_sensor
     
     bool init_ok = false;  // drive detection when turned on

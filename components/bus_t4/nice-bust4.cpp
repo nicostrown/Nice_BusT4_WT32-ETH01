@@ -10,6 +10,8 @@ static const char *TAG = "bus_t4.cover";
 
 using namespace esphome::cover;
 
+uint8_t moja_zmienna = 0;
+
 // NiceBusT4::NiceBusT4(text_sensor::TextSensor *sensor) {  // Konstruktor przypisujący wskaźnik do text_sensor
   // this->pause_time_sensor = sensor;
 // }
@@ -69,14 +71,15 @@ void NiceBusT4::setup() {
   _uart =  uartBegin(_UART_NO, BAUD_WORK, SERIAL_8N1, RX_PIN, TX_PIN, 256, 256, false, 112); //for WT32
   // who's online?
 //  this->tx_buffer_.push(gen_inf_cmd(0x00, 0xff, FOR_ALL, WHO, GET, 0x00));
-  ESP_LOGD("setup", "Wywołanie setup()");
-  if (this->pause_time_sensor == nullptr) {
-    // Użycie operatora & do uzyskania wskaźnika do id(pause_time_sensor)
-    this->pause_time_sensor = &id(pause_time_sensor);
-    ESP_LOGD("setup", "pause_time_sensor został przypisany w setup: %p", this->pause_time_sensor);
-  } else {
-    ESP_LOGW("setup", "pause_time_sensor już został przypisany");
-  }
+
+  // ESP_LOGD("setup", "Wywołanie setup()");
+  // if (this->pause_time_sensor == nullptr) {
+    // // Użycie operatora & do uzyskania wskaźnika do id(pause_time_sensor)
+    // this->pause_time_sensor = &id(pause_time_sensor);
+    // ESP_LOGD("setup", "pause_time_sensor został przypisany w setup: %p", this->pause_time_sensor);
+  // } else {
+    // ESP_LOGW("setup", "pause_time_sensor już został przypisany");
+  // }
 
 }
 
@@ -234,6 +237,17 @@ bool NiceBusT4::validate_message_() {                    // checking the receive
   // return false to reset rx buffer
   return false;
 }
+
+
+// void NiceBusT4::set_pause_time(uint8_t nowy_pause_time) {
+  // pause_time = nowy_pause_time;
+
+  // // Konwersja uint8_t na string
+  // std::string pause_time_str = std::to_string(pause_time);
+
+  // // Aktualizuj text_sensor bezpośrednio
+  // id(moj_text_sensor).publish_state(pause_time_str.c_str());
+// }
 
 // parse the received packages
 void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
@@ -422,12 +436,17 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           // }
           // id(pause_time_sensor).publish_state(String(pause_time).c_str()); //Update sensor with id pause_time_sensor
           // id(pause_time_number).set_value(pause_time);
-          if (pause_time_sensor != nullptr) { // Aktualizacja wartości sensora, jeśli wskaźnik jest poprawnie ustawiony
-            ESP_LOGD("debug", "Aktualizacja pause_time_sensor: %p", pause_time_sensor);
-            pause_time_sensor->publish_state(String(pause_time).c_str());
-          } else {
-            ESP_LOGW("debug", "pause_time_sensor jest nullptr w parse_status_packet");
-          }
+          // if (pause_time_sensor != nullptr) { // Aktualizacja wartości sensora, jeśli wskaźnik jest poprawnie ustawiony
+            // ESP_LOGD("debug", "Aktualizacja pause_time_sensor: %p", pause_time_sensor);
+            // pause_time_sensor->publish_state(String(pause_time).c_str());
+          // } else {
+            // ESP_LOGW("debug", "pause_time_sensor jest nullptr w parse_status_packet");
+          // }
+          //Kolejna metoda
+          std::string pause_time_str = std::to_string(pause_time);
+          id(pause_time_sensor).publish_state(pause_time_str.c_str());
+          
+          
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;
         

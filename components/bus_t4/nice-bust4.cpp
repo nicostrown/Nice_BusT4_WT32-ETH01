@@ -10,8 +10,9 @@ static const char *TAG = "bus_t4.cover";
 
 using namespace esphome::cover;
 
-
-
+NiceBusT4::NiceBusT4(TextSensor *sensor) {  // Konstruktor przypisujący wskaźnik do text_sensor
+  this->pause_time_sensor = sensor;
+}
 
 CoverTraits NiceBusT4::get_traits() {
   auto traits = CoverTraits();
@@ -223,16 +224,12 @@ bool NiceBusT4::validate_message_() {                    // checking the receive
   // here we do something with the message
   parse_status_packet(rx_message_);
 
-
-
   // return false to reset rx buffer
   return false;
-
 }
 
-
 // parse the received packages
-void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
+void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
   if ((data[1] == 0x0d) && (data[13] == 0xFD)) { // error
     ESP_LOGE(TAG,  "Command not available for this device" );
   }
@@ -415,8 +412,11 @@ void NiceBusT4::parse_status_packet (const std::vector<uint8_t> &data) {
           // if (sensor != nullptr) {
             // sensor->publish_state(String(pause_time).c_str());  // Wywołanie funkcji w ESPHome, która zaktualizuje text_sensor
           // }
-          id(pause_time_sensor).publish_state(String(pause_time).c_str());
+          // id(pause_time_sensor).publish_state(String(pause_time).c_str()); //Update sensor with id pause_time_sensor
           // id(pause_time_number).set_value(pause_time);
+          if (pause_time_sensor != nullptr) { // Aktualizacja wartości sensora, jeśli wskaźnik jest poprawnie ustawiony
+            pause_time_sensor->publish_state(String(pause_time).c_str());
+          }
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds
           break;
         
@@ -1005,7 +1005,7 @@ void NiceBusT4::send_raw_cmd(std::string data) {
 }
 
 //  Here you need to add a check for incorrect data from the user
-std::vector<uint8_t> NiceBusT4::raw_cmd_prepare (std::string data) { // preparing user-entered data for sending
+std::vector<uint8_t> NiceBusT4::raw_cmd_prepare(std::string data) { // preparing user-entered data for sending
   // remove everything except hexadecimal letters and numbers
   data.erase(remove_if(data.begin(), data.end(), [](const unsigned char ch) {
     return (!(isxdigit(ch)) );
@@ -1025,10 +1025,10 @@ std::vector<uint8_t> NiceBusT4::raw_cmd_prepare (std::string data) { // preparin
 }
 
 
-void NiceBusT4::send_array_cmd (std::vector<uint8_t> data) {          // sends break + command prepared earlier in the array
+void NiceBusT4::send_array_cmd(std::vector<uint8_t> data) {          // sends break + command prepared earlier in the array
   return send_array_cmd((const uint8_t *)data.data(), data.size());
 }
-void NiceBusT4::send_array_cmd (const uint8_t *data, size_t len) {
+void NiceBusT4::send_array_cmd(const uint8_t *data, size_t len) {
   // sending data to uart
 
   char br_ch = 0x00;                            // for break
@@ -1080,7 +1080,7 @@ void NiceBusT4::set_mcu(std::string command, std::string data_command) {
   }
   
 // device initialization
-void NiceBusT4::init_device (const uint8_t addr1, const uint8_t addr2, const uint8_t device ) {
+void NiceBusT4::init_device(const uint8_t addr1, const uint8_t addr2, const uint8_t device ) {
   if (device == FOR_CU) {
     ESP_LOGI(TAG, "Checkinf motor settings");
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, TYPE_M, GET, 0x00)); // drive type request

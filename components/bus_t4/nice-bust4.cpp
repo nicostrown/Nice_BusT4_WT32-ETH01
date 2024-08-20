@@ -446,10 +446,10 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           // std::string pause_time_str = std::to_string(pause_time);
           // id(pause_time_sensor).publish_state(pause_time_str.c_str());
           if (this->pause_time_sensor != nullptr) {
-            std::string pause_time_str = std::to_string(this->pause_time); // Konwersja uint8_t na string
-            this->pause_time_sensor->publish_state(pause_time_str);  // Aktualizuj text_sensor bezpośrednio
+            std::string pause_time_str = std::to_string(this->pause_time);
+            this->pause_time_sensor->publish_state(pause_time_str);
           } else {
-              ESP_LOGW("bus_t4", "pause_time_sensor is not set!");
+            ESP_LOGW("bus_t4", "pause_time_sensor is not set!");
           }
           
           ESP_LOGCONFIG(TAG, "  Pause time - settings level 2, L1: %u", pause_time ); //in seconds

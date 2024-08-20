@@ -56,7 +56,8 @@ is an intelligent engine, this value is 1 (adr = 1).
 #include "esphome/core/helpers.h"              // parse strings with built-in tools
 #include <queue>                               // for working with a queue
 #include <string>
-
+#include "esphome/components/text_sensor/text_sensor.h"
+#include "esphome/components/text_sensor/template_text_sensor.h"
 
 namespace esphome {
 namespace bus_t4 {
@@ -407,7 +408,7 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
     uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
     
-    text_sensor::TextSensor *pause_time_sensor{nullptr}; // Wskaźnik do text_sensor
+    esphome::template_::TemplateTextSensor *pause_time_sensor{nullptr};// Wskaźnik do text_sensor
     // void set_pause_time(uint8_t nowy_pause_time);
     // text_sensor::TextSensor *pause_time_sensor;  // Deklaracja wskaźnika do text_sensor
     // NiceBusT4() : pause_time_sensor(nullptr) {}  // Domyślny konstruktor

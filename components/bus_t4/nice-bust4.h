@@ -407,6 +407,7 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t lock_time;      // = 0x5A, Output settings - Lock operation time
     uint8_t lamp_time;      // = 0x5B, Output settings - courtesy light time
     uint8_t s_cup_time;     // = 0x5C, Output Setting - Suction Cup Time
+    uint16_t p_count;       // = 0xB2, P_COUNT - current number of cycles
     
     // esphome::text_sensor::TextSensor *pause_time_sensor{nullptr};  // Wskaźnik do TextSensor
     // void set_pause_time(uint8_t nowy_pause_time);

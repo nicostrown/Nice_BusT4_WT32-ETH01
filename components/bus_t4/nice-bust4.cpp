@@ -469,7 +469,12 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           this->motor_speed_close = data[14];
           ESP_LOGCONFIG(TAG, "  Motor speed close - settings level 2, L3: %u", motor_speed_close ); 
           break;
-        
+
+        case P_COUNT:
+          this->p_count = data[14];
+          ESP_LOGCONFIG(TAG, "  Number of cycles: %u", p_count ); 
+          break;
+          
       } // switch cmd_submnu
     } // if completed responses to GET requests received without errors from the drive
 
@@ -531,7 +536,10 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
         case SPEED_CLS:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_CLS, GET)); // pause time
          break;
-        
+
+        case P_COUNT:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, P_COUNT, GET)); // number of cycles
+         break;
       }// switch cmd_submnu
     }// if responses to SET requests received without errors from the drive
 
@@ -969,6 +977,7 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Step by step mode - level 2, L2: %u ", step_by_step_mode);
   ESP_LOGCONFIG(TAG, "  Motor speed open - level 2, L3: %u ", motor_speed_open);
   ESP_LOGCONFIG(TAG, "  Motor speed close - level 2, L3: %u ", motor_speed_close);
+  ESP_LOGCONFIG(TAG, "  Number of cycles: %u ", p_count);
 
 }
 
@@ -1147,6 +1156,8 @@ void NiceBusT4::init_device(const uint8_t addr1, const uint8_t addr2, const uint
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_OPN, GET, 0x00)); // Speed open
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_CLS, GET, 0x00)); // Speed close
     
+    //other settings/informations
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_COUNT, GET, 0x00)); // Number of cycles
   }
   if (device == FOR_OXI) {
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, FOR_ALL, PRD, GET, 0x00)); // product request

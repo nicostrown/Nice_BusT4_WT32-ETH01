@@ -163,7 +163,7 @@ button:
     id: update_values
     on_press:
       then:
-        - component.update: pause_time_sensor  # Zaktualizuj text_sensor natychmiastowo
+        - component.update: pause_time_sensor  # Update text_sensor immedietely
 
   # - platform: template
   #   name: test_check_cmd
@@ -614,7 +614,7 @@ esphome:
 #L1 - Pause time
 number:
   - platform: template
-    name: Pause time
+    name: l2L1 - Pause time
     id: pause_time_number
     min_value: 0
     max_value: 250
@@ -659,7 +659,7 @@ number:
 #L2 - step by step mode
 select:
   - platform: template
-    name: l2L2 - SBS mode
+    name: l2L2 - SBS mode select
     id: sbs_mode_select
     # optimistic: True
     options:
@@ -673,7 +673,6 @@ select:
       - 'L8 - Otwarcie w trybie „półautomatycznym”, zamknięcie w trybie „manualnym”'
     # initial_option: 'L1 - Otwiera	-	stop	-	zamyka	-	stop'
     lambda: |-
-      if (my_nice_cover -> NiceBusT4::step_by_step_mode) {
         std::string new_option;
         switch (my_nice_cover -> NiceBusT4::step_by_step_mode) {
           case 1:
@@ -701,51 +700,69 @@ select:
             new_option = "L8 - Otwarcie w trybie „półautomatycznym”, zamknięcie w trybie „manualnym”";
             break;
           default:
-            new_option = "L2 - Otwiera - stop - zamyka - otwiera";  // Default option if the level is out of range
+            new_option = "unknown";  // Default option if the level is out of range
+            //new_option = "L1 - Otwiera - stop - zamyka - stop";  // Default option if the level is out of range  
         }
         //id(sbs_mode_select).publish_state(new_option.c_str());
         return new_option;
-      }
-      
-#     # else {
-#     #   return "L1 - Otwiera - stop - zamyka - stop";  // Default return if my_nice_cover or step_by_step_mode is not available
-#     # }
+
+    # lambda: |-
+    #   int mode = my_nice_cover->NiceBusT4::step_by_step_mode;
+    #   if (mode >= 1 && mode <= 8) {
+    #     return id(sbs_mode_select).at(mode - 1); //.value() If the value of mode is in the range 1-8, then we directly return the appropriate option from the list using get_options().at(mode - 1), since the indices in get_options() start from 0 and our modes start from 1.
+    #   } else {
+    #     //return("unknown");
+    #     //return {};
+    #     //return 1;
+    #     //return("L7 - Manualny");
+    #     std::string new_option;
+    #     new_option = "L7 - Manualny";
+    #     return new_option;
+    #   }
+
     set_action: 
       then:
         # - logger.log: "wybrano opcję"
         - logger.log: 
             format: "wybrano opcję %s"
             args: [ "x.c_str()" ]
+        # - lambda: |-
+        #     std::string sbs_mode_variable;
+        #     if (x == "L1 - Otwiera - stop - zamyka - stop") {
+        #       sbs_mode_variable = "1";
+        #     } else if (x == "L2 - Otwiera - stop - zamyka - otwiera") {
+        #       sbs_mode_variable = "2";
+        #     } else if (x == "L3 - Otwiera - zamyka - otwiera - zamyka") {
+        #       sbs_mode_variable = '3';
+        #       // ESP_LOGD("debug", "Wybrano opcję L3");
+        #     } else if (x == "L4 - Zespół mieszkalny") {
+        #       sbs_mode_variable = "4";
+        #     } else if (x == "L5 - Zespół mieszkalny 2 (ponad 2” zatrzymuje)") {
+        #       sbs_mode_variable = "5";
+        #     } else if (x == "L6 - Krok po Kroku 2 (mniej niż 2” otwiera częściowo)") {
+        #       sbs_mode_variable = "6";
+        #     } else if (x == "L7 - Manualny") {
+        #       sbs_mode_variable = "7";
+        #     } else if (x == "L8 - Otwarcie w trybie „półautomatycznym”, zamknięcie w trybie „manualnym”") {
+        #       sbs_mode_variable = "8";
+        #     }
+        #     // ESP_LOGD("debug", "sbs_mode_variable: %s", sbs_mode_variable);
+        #     // ESP_LOGD("debug", "sbs_mode_variable: %s", sbs_mode_variable.c_str());
+        #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "61", "a9", "00", true, sbs_mode_variable.c_str());
+        #     my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "61", "99", "00", true, "01");
         - lambda: |-
-            std::string sbs_mode_variable;
-            if (x == "L1 - Otwiera - stop - zamyka - stop") {
-              sbs_mode_variable = "1";
-            } else if (x == "L2 - Otwiera - stop - zamyka - otwiera") {
-              sbs_mode_variable = "2";
-            } else if (x == "L3 - Otwiera - zamyka - otwiera - zamyka") {
-              sbs_mode_variable = '3';
-              // ESP_LOGD("debug", "Wybrano opcję L3");
-            } else if (x == "L4 - Zespół mieszkalny") {
-              sbs_mode_variable = "4";
-            } else if (x == "L5 - Zespół mieszkalny 2 (ponad 2” zatrzymuje)") {
-              sbs_mode_variable = "5";
-            } else if (x == "L6 - Krok po Kroku 2 (mniej niż 2” otwiera częściowo)") {
-              sbs_mode_variable = "6";
-            } else if (x == "L7 - Manualny") {
-              sbs_mode_variable = "7";
-            } else if (x == "L8 - Otwarcie w trybie „półautomatycznym”, zamknięcie w trybie „manualnym”") {
-              sbs_mode_variable = "8";
-            }
-            // ESP_LOGD("debug", "sbs_mode_variable: %s", sbs_mode_variable);
-            // ESP_LOGD("debug", "sbs_mode_variable: %s", sbs_mode_variable.c_str());
-            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "61", "a9", "00", true, sbs_mode_variable.c_str());
-            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", "61", "99", "00", true, "01");          
+            auto index_optional = id(sbs_mode_select).index_of(x.c_str());
+            int index = index_optional.value_or(0) + 1; //Conversion from optional to int. Indexes are numbered from 0, so we add 1 to get the correct mode number (1 to 8).
+            char sbs_mode_variable[2];
+            snprintf(sbs_mode_variable, sizeof(sbs_mode_variable), "%d", index);
+            my_nice_cover->NiceBusT4::send_inf_cmd("0003", "04", "61", "a9", "00", true, sbs_mode_variable);
+            my_nice_cover->NiceBusT4::send_inf_cmd("0003", "04", "61", "99", "00", true, "01");               
         - delay: 1s  
         # - lambda: |-
-        #     id(pause_time_number).publish_state(my_nice_cover -> NiceBusT4::pause_time); //to be sure that value is updated
+            # id(sbs_mode_select).publish_state(my_nice_cover -> NiceBusT4::step_by_step_mode); //to be sure that value is updated
         - component.update: sbs_mode  # update text_sensor immedietely
 
-# For information purposes - just to be sure
+# For information purposes - just to be sure of setting values
 text_sensor:
   - platform: template
     name: "l2L1: Pause time"

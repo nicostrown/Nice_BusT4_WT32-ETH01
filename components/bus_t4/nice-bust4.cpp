@@ -471,7 +471,7 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           break;
 
         case P_COUNT:
-          this->p_count = (data[14] << 8) + data[15];
+          this->p_count = (data[14] << 24) + (data[15] << 16) + (data[16] << 8) + data[17];
           ESP_LOGCONFIG(TAG, "  Number of cycles: %u", p_count ); 
           break;
           

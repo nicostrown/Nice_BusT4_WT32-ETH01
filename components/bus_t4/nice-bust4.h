@@ -383,11 +383,11 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t motor_speed_open;   // l2L3 - motor speed 
     uint8_t motor_speed_close;  // l2L3 - motor speed
     uint8_t GOI_mode;           // l2L4 - GOI output
-    uint8_t motor_force_open    // l2L5 - motor force
-    uint8_t motor_force_close   // l2L5 - motor force
-    uint8_t p_open_mode;       // l2L6 - partial open - 0x21
-    uint8_t maint_not_mode;    // l2L7 - maintenance notification
-    uint8_t fault_list_mode;   // l2L8 - list of faults
+    uint8_t motor_force_open;   // l2L5 - motor force
+    uint8_t motor_force_close;  // l2L5 - motor force
+    uint8_t p_open_mode;        // l2L6 - partial open - 0x21
+    uint8_t maint_not_mode;     // l2L7 - maintenance notification
+    uint8_t fault_list_mode;    // l2L8 - list of faults
     
     //additional parameters values
     uint8_t current_position;

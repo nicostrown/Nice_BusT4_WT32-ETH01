@@ -50,10 +50,10 @@ ota:
 web_server:
   port: 80
 
-# status_led:
-#   pin: 
-#     number: ${led_gpio}
-#     inverted: true
+status_led:
+  pin: 
+    number: ${led_gpio}
+    inverted: true
 
 # external_components:
 #   - source: 
@@ -163,15 +163,7 @@ button:
     id: update_values
     on_press:
       then:
-        - component.update: pause_time_text_sensor  # Update text_sensor immedietely
-        - component.update: sbs_mode_text_sensor  # Update text_sensor immedietely
-        - component.update: motor_speed_open_text_sensor  # Update text_sensor immedietely
-        - component.update: motor_speed_close_text_sensor  # Update text_sensor immedietely
-        - component.update: current_position_text_sensor  # Update text_sensor immedietely
-        - component.update: max_opn_text_sensor  # Update text_sensor immedietely
-        - component.update: pause_time_number  # Update number component immedietely
-        - component.update: sbs_mode_select  # Update select component immedietely
-
+        - component.update: pause_time_sensor  # Update text_sensor immedietely
 
   # - platform: template
   #   name: test_check_cmd
@@ -398,7 +390,49 @@ cover:
 #     name: "Gate temperature"
 #     update_interval: 120s
 
-# Set all register values:
+# on_boot:
+#   priority: 600.0
+#   then:
+#     - lambda: |-
+#         int poczatek = 0x70;
+#         int koniec = 0x9F;
+#         for (int licznik = poczatek; licznik <= koniec; ++licznik) {
+#            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", licznik, "a9", "00", true, "01");
+#            my_nice_cover -> NiceBusT4::send_inf_cmd("0003", "04", licznik, "99", "00", true, "01");
+#           ESP_LOGD("main", "Licznik: %d", licznik);
+#           delay(1000);  // Opóźnienie o 1 sekundę
+#         }
+
+# globals:
+#   - id: licznik
+#     type: int
+#     initial_value: '0x70'
+#   - id: koniec
+#     type: int
+#     initial_value: '0x9F'
+
+# # Definicja skryptu
+# script:
+#   - id: loop_script
+#     then:
+#       - lambda: |-
+#           if (id(licznik) <= id(koniec)) {
+
+#             ESP_LOGD("main", "Licznik: %d", id(licznik));
+#             id(licznik) += 1;
+#           }
+
+# interval:
+#   - interval: 1s
+#     then:
+#       - if:
+#           condition:
+#             lambda: 'return id(licznik) <= id(koniec);'
+#           then:
+#             - script.execute: loop_script
+
+
+# Ustawienie wartości:
 # globals:
 #   - id: licznik
 #     type: int
@@ -430,7 +464,7 @@ cover:
 #           then:
 #             - script.execute: loop_script
 
-# Read all register values
+# Odczyt statusu
 
 # globals:
 #   - id: licznik
@@ -471,12 +505,25 @@ cover:
 esphome:
   name: ${device_name}
   friendly_name: ${device_name_friendly}
- 
   # on_boot:
   #   priority: -10
   #   then:
   #     - lambda: |-
   #         id(bus)->pause_time_sensor = id(pause_time_sensor);  // Przypisanie wskaźnika do sensora
+
+  # on_boot:
+  #   priority: -10
+  #   then:
+  #     - lambda: |-
+  #         id(bus)->pause_time_sensor = id(pause_time_sensor);  // Przypisanie wskaźnika do sensora
+
+  # on_boot:
+  #   priority: 100
+  #   then:
+  #     - lambda: |-
+  #         my_nice_cover -> NiceBusT4::setup();
+# id(nice_bus_t4)->setup();
+
 
 # # Dodaj blok on_boot, aby uruchomić skrypt z opóźnieniem
   # on_boot:
@@ -607,7 +654,7 @@ number:
         - delay: 1s  
         - lambda: |-
             id(pause_time_number).publish_state(my_nice_cover -> NiceBusT4::pause_time); //to be sure that value is updated
-        - component.update: pause_time_text_sensor  # update text_sensor immedietely      
+        - component.update: pause_time_sensor  # update text_sensor immedietely      
 
 #L2 - step by step mode
 select:
@@ -713,13 +760,13 @@ select:
         - delay: 1s  
         # - lambda: |-
             # id(sbs_mode_select).publish_state(my_nice_cover -> NiceBusT4::step_by_step_mode); //to be sure that value is updated
-        - component.update: sbs_mode_text_sensor  # update text_sensor immedietely
+        - component.update: sbs_mode  # update text_sensor immedietely
 
 # For information purposes - just to be sure of setting values
 text_sensor:
   - platform: template
     name: "l2L1: Pause time"
-    id: pause_time_text_sensor
+    id: pause_time_sensor
     # restore_mode: DISABLED
     lambda: |-
       static char buf[4];
@@ -742,7 +789,7 @@ text_sensor:
 
   - platform: template
     name: "l2L2: SBS mode"
-    id: sbs_mode_text_sensor
+    id: sbs_mode
     lambda: |-
       static char buf[6];
       sprintf(buf, "%u", my_nice_cover -> NiceBusT4::step_by_step_mode);
@@ -750,7 +797,7 @@ text_sensor:
 
   - platform: template
     name: "l2L3: Motor speed open"
-    id: motor_speed_open_text_sensor
+    id: motor_speed_open
     lambda: |-
       static char buf[4];
       sprintf(buf, "%u", my_nice_cover -> NiceBusT4::motor_speed_open);
@@ -758,7 +805,7 @@ text_sensor:
 
   - platform: template
     name: "l2L3: Motor speed close"
-    id: motor_speed_close_text_sensor
+    id: motor_speed_close
     lambda: |-
       static char buf[4];
       sprintf(buf, "%u", my_nice_cover -> NiceBusT4::motor_speed_close);
@@ -766,7 +813,7 @@ text_sensor:
 
   - platform: template
     name: "Current position"
-    id: current_position_text_sensor
+    id: current_position_sensor
     lambda: |-
       static char buf[4];
       sprintf(buf, "%u", my_nice_cover -> NiceBusT4::current_position);
@@ -774,16 +821,8 @@ text_sensor:
 
   - platform: template
     name: "Encoder max open"
-    id: max_opn_text_sensor
+    id: max_opn_sensor
     lambda: |-
       static char buf[6];
       sprintf(buf, "%u", my_nice_cover -> NiceBusT4::max_encoder_position);
       return {buf};        
-
-  - platform: template
-    name: "Number of cycles"
-    id: number_of_cycles_text_sensor
-    lambda: |-
-      static char buf[6];
-      sprintf(buf, "%u", my_nice_cover -> NiceBusT4::p_count);
-      return {buf};  

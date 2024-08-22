@@ -158,10 +158,10 @@ enum setup_submnu : uint8_t {
   MAC            = 0x07, // Mac address
   MAN            = 0x08, // Manufacturer
   PRD            = 0x09, // Product
-  INF_SUPPORT    = 0x10, // Available INF commands
   HWR            = 0x0a, // Hardware version
   FRM            = 0x0b, // Firmware version
   DSC            = 0x0c, // Description
+  INF_SUPPORT    = 0x10, // Available INF commands
   CUR_POS        = 0x11, // Current position of automation (DPRO924 then waits for positions to be set)
   MAX_OPN        = 0x12, // The maximum possible opening according to the encoder.
   POS_MAX        = 0x18, // Maximum position (opening) by encoder
@@ -226,15 +226,15 @@ enum setup_submnu : uint8_t {
   BLINK_OPN_TIME = 0x95, // Basic parameters - Blink - Opening time
   SLAVE_ON       = 0x98, // Slave mode Active
   BLINK_CLS_TIME = 0x99, // Basic parameters - Flicker - Time on closing
-  OP_BLOCK       = 0x9A, /* Main parameters - Motor blocking (Operator block)*/
-  KEY_LOCK       = 0x9C, /* Basic settings - Button locking */
+  OP_BLOCK       = 0x9A, // Main parameters - Motor blocking (Operator block)
+  KEY_LOCK       = 0x9C, // Basic settings - Button locking
   SLOW_ON        = 0xA2, // Main parameters - Slowdown
-  DIS_VAL        = 0xA4, /* Position - Value is not allowed - disable value */
-  P_COUNT        = 0xB2, /* Partial count - Dedicated counter*/
-  C_MAIN         = 0xB4, /* Cancel maintenance */
-  DIAG_BB        = 0xD0, /* DIAGNOSTICS of bluebus devices */ 
-  INF_IO         = 0xD1, /* Input-output status */
-  DIAG_PAR       = 0xD2, /* DIAGNOSTICS of other parameters */
+  DIS_VAL        = 0xA4, // Position - Value is not allowed - disable value
+  P_COUNT        = 0xB2, // Partial count - Dedicated counter
+  C_MAIN         = 0xB4, // Cancel maintenance
+  DIAG_BB        = 0xD0, // DIAGNOSTICS of bluebus devices
+  INF_IO         = 0xD1, // Input-output status
+  DIAG_PAR       = 0xD2, // DIAGNOSTICS of other parameters
   
   CUR_MAN        = 0x02, // Current Maneuver
   SUBMNU         = 0x04, // Submenu
@@ -383,7 +383,8 @@ class NiceBusT4 : public Component, public Cover {
     uint8_t motor_speed_open;   // l2L3 - motor speed 
     uint8_t motor_speed_close;  // l2L3 - motor speed
     uint8_t GOI_mode;           // l2L4 - GOI output
-    uint8_t motor_force;        // l2L5 - motor force
+    uint8_t motor_force_open    // l2L5 - motor force
+    uint8_t motor_force_close   // l2L5 - motor force
     uint8_t p_open_mode;       // l2L6 - partial open - 0x21
     uint8_t maint_not_mode;    // l2L7 - maintenance notification
     uint8_t fault_list_mode;   // l2L8 - list of faults

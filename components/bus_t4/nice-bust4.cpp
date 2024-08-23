@@ -470,6 +470,21 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
           ESP_LOGCONFIG(TAG, "  Motor speed close - settings level 2, L3: %u", motor_speed_close ); 
           break;
 
+        case OUT2:
+          this->out2 = data[14];
+          ESP_LOGCONFIG(TAG, "  GOI mode - settings level 2, L4: %u", out2 ); 
+          break;
+
+        case OPN_PWR:
+          this->motor_force_open = data[14];
+          ESP_LOGCONFIG(TAG, "  Motor force open - settings level 2, L5: %u", motor_force_open ); 
+          break;
+
+        case CLS_PWR:
+          this->motor_force_close = data[14];
+          ESP_LOGCONFIG(TAG, "  Motor force close - settings level 2, L4: %u", motor_force_close ); 
+          break;
+
         case P_COUNT:
           this->p_count = (data[14] << 24) + (data[15] << 16) + (data[16] << 8) + data[17];
           ESP_LOGCONFIG(TAG, "  Number of cycles: %u", p_count ); 
@@ -535,6 +550,18 @@ void NiceBusT4::parse_status_packet(const std::vector<uint8_t> &data) {
          
         case SPEED_CLS:
          tx_buffer_.push(gen_inf_cmd(FOR_CU, SPEED_CLS, GET)); // pause time
+         break;
+
+        case OUT2:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, OUT2, GET)); // pause time
+         break;
+
+        case OPN_PWR:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, OPN_PWR, GET)); // open force
+         break;
+
+        case CLS_PWR:
+         tx_buffer_.push(gen_inf_cmd(FOR_CU, CLS_PWR, GET)); // close force
          break;
 
         case P_COUNT:
@@ -977,6 +1004,9 @@ void NiceBusT4::dump_config() {    //  add information about the connected contr
   ESP_LOGCONFIG(TAG, "  Step by step mode - level 2, L2: %u ", step_by_step_mode);
   ESP_LOGCONFIG(TAG, "  Motor speed open - level 2, L3: %u ", motor_speed_open);
   ESP_LOGCONFIG(TAG, "  Motor speed close - level 2, L3: %u ", motor_speed_close);
+  ESP_LOGCONFIG(TAG, "  GOI mode - level 2, L4: %u ", out2);
+  ESP_LOGCONFIG(TAG, "  Motor force open - level 2, L5: %u ", motor_force_open);
+  ESP_LOGCONFIG(TAG, "  Motor force close - level 2, L5: %u ", motor_force_close);
   ESP_LOGCONFIG(TAG, "  Number of cycles: %u ", p_count);
 
 }
@@ -1151,11 +1181,14 @@ void NiceBusT4::init_device(const uint8_t addr1, const uint8_t addr2, const uint
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SLAVE_ON, GET, 0x00)); // Slave mode
 
     //level 2 settings  
-    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00)); // Pause time
-    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, COMM_SBS, GET, 0x00)); // Step by step mode
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_TIME, GET, 0x00));    // Pause time
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, COMM_SBS, GET, 0x00));  // Step by step mode
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_OPN, GET, 0x00)); // Speed open
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, SPEED_CLS, GET, 0x00)); // Speed close
-    
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, OUT2, GET, 0x00));      // GOI mode
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, OPN_PWR, GET, 0x00));   // open force
+    tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, CLS_PWR, GET, 0x00));   // close force
+
     //other settings/informations
     tx_buffer_.push(gen_inf_cmd(addr1, addr2, device, P_COUNT, GET, 0x00)); // Number of cycles
   }

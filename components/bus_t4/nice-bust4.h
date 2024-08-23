@@ -270,8 +270,8 @@ enum control_cmd : uint8_t {
   P_OPN6      = 0x0d, /* Partial opening 6 - Open and block */
   UNLK_OPN    = 0x19, /* Unlock and open */
   CLS_LOCK    = 0x0E, /* Close and block */
-  UNLCK_CLS   = 0x1A, /*  Unlock and close */
   LOCK        = 0x0F, /* Lock */
+  UNLCK_CLS   = 0x1A, /* Unlock and close */
   UNLOCK      = 0x10, /* Unlock */
   LIGHT_TIMER = 0x11, /* Light timer */
   LIGHT_SW    = 0x12, /* Light on/off */
@@ -392,15 +392,15 @@ class NiceBusT4 : public Component, public Cover {
     //additional parameters values
     uint8_t current_position;
     uint16_t max_encoder_position;
-    uint8_t opn_offset;     /* = 0x28, Opening delay open offset */
-    uint8_t cls_offset;     /* = 0x29, Delayed closing close offset */
-    uint8_t opn_dis;        /* = 0x2A, Main parameters - Opening unloading Open discharge */
-    uint8_t cls_dis;        /* = 0x2B, Main parameters - Close discharge Close discharge */
-    uint8_t rev_time;       /* = 0x31, Main parameters - Closing unloading (Brief inversion value) */
-    uint8_t opn_pwr;        // = 0x4A, Basic parameters - Force control - Opening force
-    uint8_t cls_pwr;        // = 0x4B, Basic parameters - Force control - Closing force
-    uint8_t speed_opn;      // = 0x42, Basic parameters - Speed setting - Opening speed
-    uint8_t speed_cls;      // = 0x43, Basic parameters - Speed setting - Closing speed
+    // uint8_t opn_offset;     /* = 0x28, Opening delay open offset */
+    // uint8_t cls_offset;     /* = 0x29, Delayed closing close offset */
+    // uint8_t opn_dis;        /* = 0x2A, Main parameters - Opening unloading Open discharge */
+    // uint8_t cls_dis;        /* = 0x2B, Main parameters - Close discharge Close discharge */
+    // uint8_t rev_time;       /* = 0x31, Main parameters - Closing unloading (Brief inversion value) */
+    // uint8_t opn_pwr;        // = 0x4A, Basic parameters - Force control - Opening force
+    // uint8_t cls_pwr;        // = 0x4B, Basic parameters - Force control - Closing force
+    // uint8_t speed_opn;      // = 0x42, Basic parameters - Speed setting - Opening speed
+    // uint8_t speed_cls;      // = 0x43, Basic parameters - Speed setting - Closing speed
     uint8_t speed_slw_opn;  // = 0x45, Basic parameters - Speed setting - Slow opening speed
     uint8_t speed_slw_cls;  // = 0x46, Basic parameters - Speed setting - Slow closing speed 
     uint8_t out1;           // = 0x51, Output settings
